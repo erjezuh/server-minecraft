@@ -194,12 +194,15 @@ def main() -> int:
             bloques.append(actual)
             continue
         if actual is not None:
-            # Entradas top-level ("- modid version") y anidadas ("|-- modid version").
+            # El bloque solo termina con un evento nuevo ([HH:MM:SS] ...);
+            # las líneas raras intermedias se saltan sin cortar la captura.
+            if re.match(r"\[\d{2}:\d{2}:\d{2}\]", ln):
+                actual = None
+                continue
+            # Entradas top-level ("- modid version") y anidadas ("|-- ...").
             m = re.match(r"\s*(?:\|--?|\\--?|-)\s*([A-Za-z0-9_.\-]+)(?:\s+(.+))?$", ln)
             if m:
                 actual.append((m.group(1), (m.group(2) or "?").strip()[:64]))
-            elif ln.strip():
-                actual = None
     modids = dict(max(bloques, key=len)) if bloques else {}
     norm_ids = {norm(k): k for k in modids}
 
