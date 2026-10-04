@@ -1,7 +1,10 @@
 name: Construir modpack
 
-# Build MANUAL del modpack: fija versiones, descarga .jars y genera paquetes.
-# Nunca se ejecuta solo: solo via "Run workflow". No despliega nada.
+# Build del modpack: fija versiones, descarga .jars y genera paquetes.
+# Manual ("Run workflow") + un único auto-disparo al crear este fichero en la
+# rama (los workflow_dispatch nuevos no existen hasta merge a main).
+# Reutiliza el lockfile salvo `actualizar: true`: las versiones NO cambian solas.
+# No despliega nada.
 on:
   workflow_dispatch:
     inputs:
@@ -9,6 +12,11 @@ on:
         description: "Volver a fijar versiones (true) o reutilizar lockfile (false)"
         required: false
         default: "false"
+  push:
+    branches:
+      - "arena/**"
+    paths:
+      - ".github/workflows/construir.yml"
 
 permissions:
   contents: write
