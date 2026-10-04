@@ -1,4 +1,843 @@
+# =====================================================================
+# Manifiesto del modpack — ÚNICA FUENTE DE VERDAD
+# Minecraft 1.21.1 + Fabric. Supervivencia multijugador estilo Karmaland.
+# ---------------------------------------------------------------------
+# estado_global: propuesto | aprobado
+#   - "propuesto":  solo se valida y verifica. PROHIBIDO descargar .jar.
+#   - "aprobado":   resolver.py puede fijar versiones y construir.py descargar.
+# lado: cliente | servidor | ambos
+# impacto (RAM/rendimiento aprox.): despreciable | bajo | moderado | alto | mejora
+#   - "mejora": el mod REDUCE consumo o SUBE el rendimiento (optimización).
+# verificacion: confirmada | estandar | pendiente
+#   - confirmada: verificado en Modrinth durante la propuesta (ver docs/PROPUESTA_MODS.md).
+#   - estandar:   mod ubicuo en packs 1.21.1/Fabric; lo re-verifica resolver.py.
+#   - pendiente:  resolver.py debe confirmar slug/existencia antes de incluir.
+# =====================================================================
 minecraft: "1.21.1"
 loader: "fabric"
+modpack_nombre: "Karmaland"
+modpack_version: "1.0.0"
+estado_global: propuesto
 
-mods: []
+mods:
+  # ---------------- Librerías / dependencias (no aportan contenido) ----------------
+  - slug: fabric-api
+    nombre: Fabric API
+    lado: ambos
+    categoria: libreria
+    impacto: bajo
+    verificacion: estandar
+    estado: propuesto
+    notas: Base obligatoria de todo mod de Fabric.
+  - slug: cloth-config
+    nombre: Cloth Config API
+    lado: ambos
+    categoria: libreria
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Requerida por Lootr y otros; pantallas de configuración.
+  - slug: balm
+    nombre: Balm
+    lado: ambos
+    categoria: libreria
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Requerida por Waystones y Comforts.
+  - slug: moonlight
+    nombre: Moonlight Lib
+    lado: ambos
+    categoria: libreria
+    impacto: bajo
+    verificacion: estandar
+    estado: propuesto
+    notas: Requerida por Supplementaries.
+  - slug: yungs-api
+    nombre: YUNG's API
+    lado: servidor
+    categoria: libreria
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Requerida por los mods de estructuras de YUNG (solo servidor).
+  - slug: bclib
+    nombre: BCLib
+    lado: ambos
+    categoria: libreria
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Requerida por Better Nether y Better End. WorldWeaver ya va integrado.
+  - slug: reborn-core
+    nombre: RebornCore
+    lado: ambos
+    categoria: libreria
+    impacto: bajo
+    verificacion: estandar
+    estado: propuesto
+    notas: Requerida por Tech Reborn.
+  - slug: spell-engine
+    nombre: Spell Engine
+    lado: ambos
+    categoria: libreria
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Base de hechizos de Wizards y Archers.
+  - slug: runes
+    nombre: Runes (RPG Series)
+    lado: ambos
+    categoria: libreria
+    impacto: despreciable
+    verificacion: pendiente
+    estado: propuesto
+    notas: Dependencia de Wizards/Archers; el resolver confirma el slug exacto.
+  - slug: spell-power
+    nombre: Spell Power Attributes
+    lado: ambos
+    categoria: libreria
+    impacto: despreciable
+    verificacion: pendiente
+    estado: propuesto
+    notas: Dependencia de Wizards/Archers; el resolver confirma el slug exacto.
+  - slug: azurelib-armor
+    nombre: AzureLib Armor
+    lado: ambos
+    categoria: libreria
+    impacto: bajo
+    verificacion: pendiente
+    estado: propuesto
+    notas: Dependencia de Wizards/Archers (armaduras); el resolver confirma el slug exacto.
+  - slug: structure-pool-api
+    nombre: Structure Pool API
+    lado: ambos
+    categoria: libreria
+    impacto: despreciable
+    verificacion: pendiente
+    estado: propuesto
+    notas: Dependencia de Wizards (torres); el resolver confirma el slug exacto.
+  - slug: geckolib
+    nombre: GeckoLib
+    lado: ambos
+    categoria: libreria
+    impacto: bajo
+    verificacion: pendiente
+    estado: propuesto
+    notas: Dependencia del stack RPG (Wizards); Naturalist 2.x ya NO la necesita.
+  - slug: playeranimator
+    nombre: playerAnimator
+    lado: ambos
+    categoria: libreria
+    impacto: despreciable
+    verificacion: pendiente
+    estado: propuesto
+    notas: Requerida por Better Combat; Emotecraft la lleva embebida (sin conflicto).
+  - slug: badges-lib
+    nombre: Badges Lib
+    lado: cliente
+    categoria: libreria
+    impacto: despreciable
+    verificacion: pendiente
+    estado: propuesto
+    notas: Posible dependencia de WTHIT; el resolver lo confirma o la elimina.
+
+  # ---------------- Optimización de servidor y lógica ----------------
+  - slug: lithium
+    nombre: Lithium
+    lado: ambos
+    categoria: optimizacion
+    impacto: mejora
+    verificacion: estandar
+    estado: propuesto
+    notas: Optimiza lógica del juego (TPS). Imprescindible en servidor.
+  - slug: krypton
+    nombre: Krypton
+    lado: ambos
+    categoria: optimizacion
+    impacto: mejora
+    verificacion: estandar
+    estado: propuesto
+    notas: Optimiza red y serialización de chunks.
+  - slug: ferrite-core
+    nombre: FerriteCore
+    lado: ambos
+    categoria: optimizacion
+    impacto: mejora
+    verificacion: estandar
+    estado: propuesto
+    notas: Reduce uso de RAM. Clave para 3 GB en cliente y 4 GB en servidor.
+  - slug: noisium
+    nombre: Noisium
+    lado: ambos
+    categoria: optimizacion
+    impacto: mejora
+    verificacion: estandar
+    estado: propuesto
+    notas: Acelera generación de mundo (importante con Terralith + YUNG's).
+  - slug: alternate-current
+    nombre: Alternate Current
+    lado: servidor
+    categoria: optimizacion
+    impacto: mejora
+    verificacion: estandar
+    estado: propuesto
+    notas: Redstone eficiente. Solo servidor.
+
+  # ---------------- Optimización de cliente (FPS) ----------------
+  - slug: sodium
+    nombre: Sodium
+    lado: cliente
+    categoria: optimizacion
+    impacto: mejora
+    verificacion: estandar
+    estado: propuesto
+    notas: Motor de renderizado; multiplica los FPS. Base visual del pack.
+  - slug: indium
+    nombre: Indium
+    lado: cliente
+    categoria: optimizacion
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Compatibilidad Sodium <-> mods con Fabric Renderer API (Supplementaries...).
+  - slug: sodium-extra
+    nombre: Sodium Extra
+    lado: cliente
+    categoria: optimizacion
+    impacto: mejora
+    verificacion: estandar
+    estado: propuesto
+    notas: Opciones extra (niebla, partículas, animaciones) para afinar rendimiento.
+  - slug: entityculling
+    nombre: Entity Culling
+    lado: cliente
+    categoria: optimizacion
+    impacto: mejora
+    verificacion: estandar
+    estado: propuesto
+    notas: No renderiza entidades ocultas tras bloques.
+  - slug: immediatelyfast
+    nombre: ImmediatelyFast
+    lado: cliente
+    categoria: optimizacion
+    impacto: mejora
+    verificacion: estandar
+    estado: propuesto
+    notas: Acelera render de entidades/GUI.
+  - slug: moreculling
+    nombre: MoreCulling
+    lado: cliente
+    categoria: optimizacion
+    impacto: mejora
+    verificacion: estandar
+    estado: propuesto
+    notas: Descarta caras de bloques no visibles (hojas, cofres...).
+  - slug: dynamic-fps
+    nombre: Dynamic FPS
+    lado: cliente
+    categoria: optimizacion
+    impacto: mejora
+    verificacion: estandar
+    estado: propuesto
+    notas: Baja FPS en segundo plano/minimizado. Ideal para portátiles.
+  - slug: debugify
+    nombre: Debugify
+    lado: cliente
+    categoria: optimizacion
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Corrige bugs de MC que causan tirones o errores gráficos.
+
+  # ---------------- Mundo, exploración y estructuras ----------------
+  - slug: terralith
+    nombre: Terralith
+    lado: servidor
+    categoria: mundo
+    impacto: moderado
+    verificacion: confirmada
+    estado: propuesto
+    notas: +100 biomas y cuevas épicas. Solo worldgen en servidor; coste 0 en cliente.
+  - slug: yungs-better-dungeons
+    nombre: YUNG's Better Dungeons
+    lado: servidor
+    categoria: estructuras
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Mazmorras grandes rediseñadas. Solo servidor.
+  - slug: yungs-better-mineshafts
+    nombre: YUNG's Better Mineshafts
+    lado: servidor
+    categoria: estructuras
+    impacto: bajo
+    verificacion: estandar
+    estado: propuesto
+    notas: Minas variadas y explorables. Solo servidor.
+  - slug: yungs-better-strongholds
+    nombre: YUNG's Better Strongholds
+    lado: servidor
+    categoria: estructuras
+    impacto: bajo
+    verificacion: estandar
+    estado: propuesto
+    notas: Strongholds épicas para el endgame. Solo servidor.
+  - slug: yungs-better-nether-fortresses
+    nombre: YUNG's Better Nether Fortresses
+    lado: servidor
+    categoria: estructuras
+    impacto: bajo
+    verificacion: estandar
+    estado: propuesto
+    notas: Fortalezas del Nether rediseñadas. Solo servidor.
+  - slug: structory
+    nombre: Structory
+    lado: servidor
+    categoria: estructuras
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Estructuras con ambiente y lore ligero. Solo servidor.
+  - slug: towns-and-towers
+    nombre: Towns and Towers
+    lado: ambos
+    categoria: estructuras
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Aldeas y puestos por bioma. Worldgen en servidor; en cliente queda inerte.
+  - slug: betterend
+    nombre: Better End
+    lado: ambos
+    categoria: mundo
+    impacto: moderado
+    verificacion: confirmada
+    estado: propuesto
+    notas: Reforma completa del End: biomas, mobs, rituales. Requiere BCLib.
+  - slug: betternether
+    nombre: Better Nether
+    lado: ambos
+    categoria: mundo
+    impacto: moderado
+    verificacion: confirmada
+    estado: propuesto
+    notas: Reforma completa del Nether: biomas, mobs, materiales. Requiere BCLib.
+  - slug: waystones
+    nombre: Waystones
+    lado: ambos
+    categoria: exploracion
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Teletransporte entre piedras. Esencial en multijugador. Requiere Balm.
+  - slug: nature-s-compass
+    nombre: Nature's Compass
+    lado: ambos
+    categoria: exploracion
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Localiza biomas (imprescindible con 100+ biomas de Terralith).
+  - slug: xaeros-minimap
+    nombre: Xaero's Minimap
+    lado: cliente
+    categoria: exploracion
+    impacto: bajo
+    verificacion: estandar
+    estado: propuesto
+    notas: Minimapa ligero con waypoints. Más ligero que JourneyMap.
+
+  # ---------------- Mobs y mundo vivo ----------------
+  - slug: naturalist
+    nombre: Naturalist
+    lado: ambos
+    categoria: mobs
+    impacto: moderado
+    verificacion: confirmada
+    estado: propuesto
+    notas: 47 animales con comportamientos. La v2.x ya no necesita GeckoLib.
+  - slug: friends-and-foes
+    nombre: Friends and Foes
+    lado: ambos
+    categoria: mobs
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Mobs de las votaciones (golem de cobre, glare...) + mini-jefe Wildfire.
+  - slug: corpse
+    nombre: Corpse
+    lado: ambos
+    categoria: multijugador
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Al morir dejas un cadáver con tus objetos. Clave en multijugador.
+  - slug: villager-names
+    nombre: Villager Names
+    lado: servidor
+    categoria: mobs
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Los aldeanos tienen nombre. Pequeño, divertido, da vida al mundo.
+
+  # ---------------- Magia, RPG y combate ----------------
+  - slug: wizards
+    nombre: Wizards (RPG Series)
+    lado: ambos
+    categoria: magia
+    impacto: moderado
+    verificacion: confirmada
+    estado: propuesto
+    notas: Magia completa: varitas, hechizos, túnicas y torres de mago con loot.
+  - slug: archers
+    nombre: Archers (RPG Series)
+    lado: ambos
+    categoria: rpg
+    impacto: bajo
+    verificacion: estandar
+    estado: propuesto
+    notas: Arcos y progresión a distancia. Comparte librerías con Wizards (coste marginal).
+  - slug: better-combat
+    nombre: Better Combat
+    lado: ambos
+    categoria: combate
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Combate cuerpo a cuerpo animado estilo Minecraft Dungeons. Requiere playerAnimator.
+  - slug: combat-roll
+    nombre: Combat Roll
+    lado: ambos
+    categoria: combate
+    impacto: bajo
+    verificacion: estandar
+    estado: propuesto
+    notas: Esquiva con voltereta (estilo souls). Divertido y táctico en grupo.
+  - slug: levelz
+    nombre: LevelZ
+    lado: ambos
+    categoria: rpg
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Habilidades por niveles (minería, combate...). Progresión a largo plazo.
+  - slug: enchanting-infuser
+    nombre: Enchanting Infuser
+    lado: ambos
+    categoria: magia
+    impacto: despreciable
+    verificacion: pendiente
+    estado: propuesto
+    notas: Elige encantamientos pagando XP. El resolver confirma build 1.21.1.
+
+  # ---------------- Tecnología y almacenamiento ----------------
+  - slug: techreborn
+    nombre: Tech Reborn
+    lado: ambos
+    categoria: tecnologia
+    impacto: moderado
+    verificacion: confirmada
+    estado: propuesto
+    notas: El mod tecnológico de Fabric para 1.21.1 (MI y Create no tienen Fabric aquí).
+  - slug: expanded-storage
+    nombre: Expanded Storage
+    lado: ambos
+    categoria: almacenamiento
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Cofres/barriles por niveles, vanilla+. AVISO: proyecto archivado (v1.21.1 estable).
+
+  # ---------------- Construcción y decoración ----------------
+  - slug: supplementaries
+    nombre: Supplementaries
+    lado: ambos
+    categoria: construccion
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Decoración + cacharros vanilla+ (jarras, veletas, relojes...). Requiere Moonlight.
+  - slug: another-furniture
+    nombre: Another Furniture
+    lado: ambos
+    categoria: construccion
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Muebles estilo vanilla (sillas, mesas, estanterías). Ligero, sin librerías extra.
+
+  # ---------------- Comida y agricultura ----------------
+  - slug: farmers-delight-refabricated
+    nombre: Farmer's Delight Refabricated
+    lado: ambos
+    categoria: comida
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Cocina y cultivos con progresión. Compatible con EMI.
+  - slug: appleskin
+    nombre: AppleSkin
+    lado: cliente
+    categoria: comida
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Muestra hambre/saturación en el HUD.
+
+  # ---------------- Multijugador y diversión ----------------
+  - slug: simple-voice-chat
+    nombre: Simple Voice Chat
+    lado: ambos
+    categoria: multijugador
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Chat de voz por proximidad. Necesita puerto UDP abierto en el servidor.
+  - slug: emotecraft
+    nombre: Emotecraft
+    lado: ambos
+    categoria: multijugador
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Emotes y bailes visibles por todos. Lleva playerAnimator embebido.
+  - slug: comforts
+    nombre: Comforts
+    lado: ambos
+    categoria: multijugador
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Sacos de dormir y hamacas (dormir fuera sin liar el spawn). Requiere Balm.
+  - slug: lootr
+    nombre: Lootr
+    lado: ambos
+    categoria: multijugador
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Loot instanciado por jugador en cofres. Adiós a pelearse por mazmorras.
+
+  # ---------------- Calidad de vida en cliente ----------------
+  - slug: emi
+    nombre: EMI
+    lado: cliente
+    categoria: qol
+    impacto: bajo
+    verificacion: estandar
+    estado: propuesto
+    notas: Visor de recetas. Elegido frente a REI por ser más ligero y nativo de Fabric.
+  - slug: emi-loot
+    nombre: EMI Loot
+    lado: cliente
+    categoria: qol
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Muestra loot de cofres/mobs en EMI.
+  - slug: emi-trades
+    nombre: EMI Trades
+    lado: cliente
+    categoria: qol
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Muestra tradeos de aldeanos en EMI.
+  - slug: wthit
+    nombre: WTHIT
+    lado: cliente
+    categoria: qol
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Info del bloque/entidad al mirar (la alternativa Fabric a Jade).
+  - slug: shulkerboxtooltip
+    nombre: Shulker Box Tooltip
+    lado: cliente
+    categoria: qol
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Previsualiza el contenido de shulkers sin abrirlas.
+  - slug: mouse-tweaks
+    nombre: Mouse Tweaks
+    lado: cliente
+    categoria: qol
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Arrastrar y mover objetos en inventarios con el ratón.
+  - slug: modmenu
+    nombre: Mod Menu
+    lado: cliente
+    categoria: qol
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Lista de mods + acceso a sus configuraciones.
+  - slug: chat-heads
+    nombre: Chat Heads
+    lado: cliente
+    categoria: qol
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Avatares en el chat. Pequeño y con encanto para jugar en grupo.
+
+  # ---------------- Calidad de vida en supervivencia ----------------
+  - slug: fallingtree
+    nombre: FallingTree
+    lado: ambos
+    categoria: qol
+    impacto: bajo
+    verificacion: estandar
+    estado: propuesto
+    notas: Talar un árbol entero de golpe. Clásico de series; configurable.
+  - slug: reap
+    nombre: Cosecha con clic derecho (Reap)
+    lado: ambos
+    categoria: qol
+    impacto: despreciable
+    verificacion: pendiente
+    estado: propuesto
+    notas: Cosechar cultivos con clic derecho. Si no hay build 1.21.1 estable, se descarta.
+  - slug: leaves-be-gone
+    nombre: Leaves Be Gone
+    lado: servidor
+    categoria: qol
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Hojas que desaparecen rápido al talar. Solo servidor.
+
+  # ---------------- Administración del servidor ----------------
+  - slug: chunky
+    nombre: Chunky
+    lado: servidor
+    categoria: admin
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Pre-genera el mundo para evitar lag al explorar. Solo se usa al inicio/mantenimiento.
+  - slug: spark
+    nombre: Spark
+    lado: servidor
+    categoria: admin
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Profiler de TPS/lag. Imprescindible para diagnosticar con 4 GB.
+  - slug: ledger
+    nombre: Ledger
+    lado: servidor
+    categoria: admin
+    impacto: bajo
+    verificacion: estandar
+    estado: propuesto
+    notas: Registro y rollback de bloques (antigriefing entre amigos). Solo servidor.
+
+# =====================================================================
+# OPCIONALES: no se incluyen salvo que se pidan. Mismo formato.
+# =====================================================================
+opcionales:
+  - slug: iris
+    nombre: Iris Shaders
+    lado: cliente
+    categoria: optimizacion
+    impacto: bajo
+    verificacion: estandar
+    estado: propuesto
+    notas: Soporte de shaders. Solo para quien tenga GPU de sobra (3 GB justos).
+  - slug: xaeros-world-map
+    nombre: Xaero's World Map
+    lado: cliente
+    categoria: exploracion
+    impacto: bajo
+    verificacion: estandar
+    estado: propuesto
+    notas: Mapa completo del mundo. Consume más RAM/dis co que el minimapa solo.
+  - slug: litematica
+    nombre: Litematica
+    lado: cliente
+    categoria: construccion
+    impacto: bajo
+    verificacion: estandar
+    estado: propuesto
+    notas: Planos y esquemas para construir. Requiere Malilib.
+  - slug: malilib
+    nombre: Malilib
+    lado: cliente
+    categoria: libreria
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Librería de Litematica.
+  - slug: sound-physics-remastered
+    nombre: Sound Physics Remastered
+    lado: cliente
+    categoria: inmersion
+    impacto: bajo
+    verificacion: estandar
+    estado: propuesto
+    notas: Reverberación realista. Combina con Simple Voice Chat.
+  - slug: presence-footsteps
+    nombre: Presence Footsteps
+    lado: cliente
+    categoria: inmersion
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Sonidos de pasos según superficie. Atmósfera por 0 RAM.
+  - slug: not-enough-animations
+    nombre: Not Enough Animations
+    lado: cliente
+    categoria: inmersion
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Animaciones en primera persona (comer, mapas...). Mundo más vivo.
+  - slug: eating-animation
+    nombre: Eating Animation
+    lado: cliente
+    categoria: inmersion
+    impacto: despreciable
+    verificacion: pendiente
+    estado: propuesto
+    notas: Animación al comer visible para otros. Verificar slug/build 1.21.1.
+  - slug: tectonic
+    nombre: Tectonic (datapack)
+    lado: servidor
+    categoria: mundo
+    impacto: moderado
+    verificacion: estandar
+    estado: propuesto
+    notas: Terreno aún más épico junto a Terralith. OJO: sube coste de generación.
+  - slug: chipped
+    nombre: Chipped
+    lado: ambos
+    categoria: construccion
+    impacto: moderado
+    verificacion: pendiente
+    estado: propuesto
+    notas: Miles de variantes de bloques. Pesa en cliente (texturas); requiere Architectury.
+  - slug: architectury-api
+    nombre: Architectury API
+    lado: ambos
+    categoria: libreria
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Solo necesaria si se activa Chipped. El core NO la necesita.
+  - slug: macaws-doors
+    nombre: Macaw's Doors
+    lado: ambos
+    categoria: construccion
+    impacto: bajo
+    verificacion: pendiente
+    estado: propuesto
+    notas: Puertas extra. Alternativa/complemento deco si se quiere más variedad.
+  - slug: macaws-windows
+    nombre: Macaw's Windows
+    lado: ambos
+    categoria: construccion
+    impacto: bajo
+    verificacion: pendiente
+    estado: propuesto
+    notas: Ventanas extra. Alternativa/complemento deco si se quiere más variedad.
+  - slug: macaws-roofs
+    nombre: Macaw's Roofs
+    lado: ambos
+    categoria: construccion
+    impacto: bajo
+    verificacion: pendiente
+    estado: propuesto
+    notas: Tejados extra. Alternativa/complemento deco si se quiere más variedad.
+  - slug: luckperms
+    nombre: LuckPerms
+    lado: servidor
+    categoria: admin
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Permisos y rangos. Solo si hace falta más que OPs.
+  - slug: no-chat-reports
+    nombre: No Chat Reports
+    lado: ambos
+    categoria: admin
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Desactiva el reporte de chat de Mojang (servidor privado entre amigos).
+  - slug: deathlog
+    nombre: DeathLog
+    lado: servidor
+    categoria: admin
+    impacto: despreciable
+    verificacion: pendiente
+    estado: propuesto
+    notas: Historial de muertes gracioso para la serie. Verificar build 1.21.1.
+  - slug: server-core
+    nombre: ServerCore
+    lado: servidor
+    categoria: optimizacion
+    impacto: mejora
+    verificacion: estandar
+    estado: propuesto
+    notas: Optimizaciones extra + utilidades. Solo si Lithium no basta; solapa parcial.
+
+# =====================================================================
+# DESCARTADOS: documentados para no re-añadirlos sin motivo.
+# =====================================================================
+descartados:
+  - nombre: Create
+    motivo: Sin versión Fabric para 1.21.1 (oficialmente NeoForge). Port no oficial abandonado/retirado.
+  - nombre: Modern Industrialization
+    motivo: Desde 1.20.4 es exclusivo de NeoForge; en Fabric se quedó en 1.20.1. Sustituido por Tech Reborn.
+  - nombre: Industrial Revolution
+    motivo: Sin soporte 1.21.1 confirmado; Tech Reborn sí lo tiene y cubre el hueco tecnológico.
+  - nombre: Mekanism / Refined Storage / AE2 / Powah / Pipez
+    motivo: Exclusivos de Forge/NeoForge. Sin equivalente directo: se cubre con Tech Reborn + Expanded Storage.
+  - nombre: Iron's Spells 'n Spellbooks
+    motivo: Exclusivo de Forge/NeoForge. Alternativa Fabric: Wizards (RPG Series).
+  - nombre: Ars Nouveau
+    motivo: Exclusivo de Forge/NeoForge. Alternativa Fabric: Wizards (RPG Series).
+  - nombre: Botania
+    motivo: Pesado para el presupuesto de RAM y su soporte Fabric es dudoso; solapa con Wizards.
+  - nombre: Biomes O' Plenty / Oh The Biomes We've Gone
+    motivo: Sin Fabric 1.21.1 fiable (BYG es NeoForge). Terralith cubre mejor el hueco.
+  - nombre: Epic Fight
+    motivo: Exclusivo de Forge/NeoForge. Alternativa Fabric: Better Combat + Combat Roll.
+  - nombre: Jade
+    motivo: En 1.21.1 el visor/info es de Forge/NeoForge; en Fabric se usa WTHIT.
+  - nombre: REI (Roughly Enough Items)
+    motivo: Duplica a EMI siendo más pesado (necesita Architectury). Se eligió EMI.
+  - nombre: JourneyMap
+    motivo: Mucho más pesado en RAM/dis co que Xaero's Minimap para el mismo uso.
+  - nombre: Storage Drawers / Sophisticated Storage / Tom's Simple Storage
+    motivo: De Forge/NeoForge o sin port fiable. Se cubre con Expanded Storage + Tech Reborn.
+  - nombre: Functional Storage
+    motivo: El oficial no tiene Fabric 1.21.1; el port no oficial es diminuto y arriesgado.
+  - nombre: FramedBlocks
+    motivo: Exclusivo de Forge/NeoForge. La construcción se cubre con Supplementaries + Another Furniture.
+  - nombre: Explorer's Compass
+    motivo: Duplica parcialmente a Nature's Compass (biomas vs estructuras); se prioriza biomas por Terralith.
+  - nombre: When Dungeons Arise / Born in Chaos
+    motivo: Packs de estructuras pesados; YUNG's + Structory + Towns and Towers cubren el hueco siendo ligeros.
+  - nombre: Guard Villagers
+    motivo: Sin build 1.21.1/Fabric confirmada. Se re-evaluará si aparece versión estable.
+  - nombre: C2ME
+    motivo: Paraleliza chunks pero es famoso por inestabilidad con mods de worldgen. Riesgo inaceptable.
+  - nombre: ModernFix
+    motivo: Riesgo de conflictos; FerriteCore + Lithium + Krypton cubren la optimización sin tocar lógica delicada.
+  - nombre: VMP (Very Many Players)
+    motivo: Pensado for cientos de jugadores; overkill para un servidor de amigos.
+  - nombre: Architectury API (en core)
+    motivo: Ningún mod del core la requiere (solo el opcional Chipped). No se añade peso muerto.
+  - nombre: Litematica (en core)
+    motivo: Útil pero solo para constructores; queda como opcional de cliente (requiere Malilib).
+  - nombre: Shaders incluidos por defecto
+    motivo: Con 3 GB de cliente no son viables de serie; Iris queda opcional para quien pueda.
+  - nombre: Essential Mod
+    motivo: Servicio externo cerrado, no encaja con servidor auto-alojado. El multijugador se cubre con SVC + Waystones.

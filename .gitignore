@@ -1,0 +1,17 @@
+# Artefactos generados (nunca se suben .jar al repo)
+build/
+*.jar
+*.mrpack
+*.zip
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
