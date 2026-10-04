@@ -69,14 +69,14 @@ mods:
     verificacion: confirmada
     estado: propuesto
     notas: Requerida por Better Nether y Better End. WorldWeaver ya va integrado.
-  - slug: reborn-core
+  - slug: reborncore
     nombre: RebornCore
     lado: ambos
     categoria: libreria
     impacto: bajo
-    verificacion: estandar
+    verificacion: confirmada
     estado: propuesto
-    notas: Requerida por Tech Reborn.
+    notas: Requerida por Tech Reborn. OJO: el slug correcto es 'reborncore' (sin guion).
   - slug: spell-engine
     nombre: Spell Engine
     lado: ambos
@@ -90,57 +90,73 @@ mods:
     lado: ambos
     categoria: libreria
     impacto: despreciable
-    verificacion: pendiente
+    verificacion: confirmada
     estado: propuesto
-    notas: Dependencia de Wizards/Archers; el resolver confirma el slug exacto.
+    notas: Dependencia de Wizards (runas/munición de hechizos). ID verificado en Modrinth.
   - slug: spell-power
     nombre: Spell Power Attributes
     lado: ambos
     categoria: libreria
     impacto: despreciable
-    verificacion: pendiente
+    verificacion: confirmada
     estado: propuesto
-    notas: Dependencia de Wizards/Archers; el resolver confirma el slug exacto.
-  - slug: azurelib-armor
-    nombre: AzureLib Armor
+    notas: Dependencia de Spell Engine (atributos de poder). ID verificado en Modrinth.
+  - slug: armor-model-api
+    nombre: Armor Model API
     lado: ambos
     categoria: libreria
     impacto: bajo
-    verificacion: pendiente
+    verificacion: confirmada
     estado: propuesto
-    notas: Dependencia de Wizards/Archers (armaduras); el resolver confirma el slug exacto.
+    notas: Requerida por Wizards y Archers 3.x (túnicas). Va por el pipeline vanilla: compatible con Sodium.
   - slug: structure-pool-api
     nombre: Structure Pool API
     lado: ambos
     categoria: libreria
     impacto: despreciable
-    verificacion: pendiente
+    verificacion: confirmada
     estado: propuesto
-    notas: Dependencia de Wizards (torres); el resolver confirma el slug exacto.
-  - slug: geckolib
-    nombre: GeckoLib
+    notas: Dependencia de Wizards/Archers (torres). ID verificado en Modrinth.
+  - slug: ranged-weapon-api
+    nombre: Ranged Weapon API
+    lado: ambos
+    categoria: libreria
+    impacto: despreciable
+    verificacion: confirmada
+    estado: propuesto
+    notas: Requerida por Archers (arcos funcionales).
+  - slug: trinkets
+    nombre: Trinkets
     lado: ambos
     categoria: libreria
     impacto: bajo
-    verificacion: pendiente
+    verificacion: confirmada
     estado: propuesto
-    notas: Dependencia del stack RPG (Wizards); Naturalist 2.x ya NO la necesita.
+    notas: Requerida por Spell Engine (slot del libro de hechizos). Estándar de Fabric.
+  - slug: resourceful-lib
+    nombre: Resourceful Lib
+    lado: ambos
+    categoria: libreria
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Requerida por Friends and Foes.
   - slug: playeranimator
     nombre: playerAnimator
     lado: ambos
     categoria: libreria
     impacto: despreciable
-    verificacion: pendiente
+    verificacion: confirmada
     estado: propuesto
-    notas: Requerida por Better Combat; Emotecraft la lleva embebida (sin conflicto).
-  - slug: badges-lib
-    nombre: Badges Lib
+    notas: Requerida por Spell Engine, Better Combat y Combat Roll. Emotecraft la lleva embebida.
+  - slug: badpackets
+    nombre: Bad Packets
     lado: cliente
     categoria: libreria
     impacto: despreciable
-    verificacion: pendiente
+    verificacion: confirmada
     estado: propuesto
-    notas: Posible dependencia de WTHIT; el resolver lo confirma o la elimina.
+    notas: Requerida por WTHIT (mensajería de red). Se instala junto a WTHIT en cliente.
 
   # ---------------- Optimización de servidor y lógica ----------------
   - slug: lithium
@@ -301,12 +317,12 @@ mods:
     notas: Estructuras con ambiente y lore ligero. Solo servidor.
   - slug: towns-and-towers
     nombre: Towns and Towers
-    lado: ambos
+    lado: servidor
     categoria: estructuras
     impacto: bajo
     verificacion: confirmada
     estado: propuesto
-    notas: Aldeas y puestos por bioma. Worldgen en servidor; en cliente queda inerte.
+    notas: Aldeas y puestos por bioma. Modrinth: servidor requerido, cliente opcional -> solo servidor.
   - slug: betterend
     nombre: Better End
     lado: ambos
@@ -423,14 +439,6 @@ mods:
     verificacion: confirmada
     estado: propuesto
     notas: Habilidades por niveles (minería, combate...). Progresión a largo plazo.
-  - slug: enchanting-infuser
-    nombre: Enchanting Infuser
-    lado: ambos
-    categoria: magia
-    impacto: despreciable
-    verificacion: pendiente
-    estado: propuesto
-    notas: Elige encantamientos pagando XP. El resolver confirma build 1.21.1.
 
   # ---------------- Tecnología y almacenamiento ----------------
   - slug: techreborn
@@ -595,14 +603,14 @@ mods:
     verificacion: estandar
     estado: propuesto
     notas: Talar un árbol entero de golpe. Clásico de series; configurable.
-  - slug: reap
-    nombre: Cosecha con clic derecho (Reap)
-    lado: ambos
+  - slug: simple-harvest
+    nombre: Simple Harvest (cosecha con clic derecho)
+    lado: servidor
     categoria: qol
     impacto: despreciable
-    verificacion: pendiente
+    verificacion: confirmada
     estado: propuesto
-    notas: Cosechar cultivos con clic derecho. Si no hay build 1.21.1 estable, se descarta.
+    notas: Cosecha y replanta con clic derecho (5 KB, solo servidor, solo pide Fabric API).
   - slug: leaves-be-gone
     nombre: Leaves Be Gone
     lado: servidor
@@ -703,9 +711,9 @@ opcionales:
     lado: cliente
     categoria: inmersion
     impacto: despreciable
-    verificacion: pendiente
+    verificacion: estandar
     estado: propuesto
-    notas: Animación al comer visible para otros. Verificar slug/build 1.21.1.
+    notas: Anima el sprite al comer/beber. Cliente puro hasta 1.21.1; lo confirma el resolver.
   - slug: tectonic
     nombre: Tectonic (datapack)
     lado: servidor
@@ -719,9 +727,9 @@ opcionales:
     lado: ambos
     categoria: construccion
     impacto: moderado
-    verificacion: pendiente
+    verificacion: estandar
     estado: propuesto
-    notas: Miles de variantes de bloques. Pesa en cliente (texturas); requiere Architectury.
+    notas: Miles de variantes (jar de 14,3 MB). Pesa en cliente; requiere Architectury. Solo si sobra RAM.
   - slug: architectury-api
     nombre: Architectury API
     lado: ambos
@@ -735,9 +743,9 @@ opcionales:
     lado: ambos
     categoria: construccion
     impacto: bajo
-    verificacion: pendiente
+    verificacion: estandar
     estado: propuesto
-    notas: Puertas extra. Alternativa/complemento deco si se quiere más variedad.
+    notas: Puertas extra (build 1.21.1/Fabric verificada). Alternativa/complemento deco.
   - slug: macaws-windows
     nombre: Macaw's Windows
     lado: ambos
@@ -770,14 +778,6 @@ opcionales:
     verificacion: estandar
     estado: propuesto
     notas: Desactiva el reporte de chat de Mojang (servidor privado entre amigos).
-  - slug: deathlog
-    nombre: DeathLog
-    lado: servidor
-    categoria: admin
-    impacto: despreciable
-    verificacion: pendiente
-    estado: propuesto
-    notas: Historial de muertes gracioso para la serie. Verificar build 1.21.1.
   - slug: server-core
     nombre: ServerCore
     lado: servidor
@@ -841,3 +841,15 @@ descartados:
     motivo: Con 3 GB de cliente no son viables de serie; Iris queda opcional para quien pueda.
   - nombre: Essential Mod
     motivo: Servicio externo cerrado, no encaja con servidor auto-alojado. El multijugador se cubre con SVC + Waystones.
+  - nombre: Enchanting Infuser
+    motivo: Pide 2 librerías extra no listadas (Puzzles Lib + Forge Config API Port) para un lujo menor; basta el encantamiento vanilla.
+  - nombre: GeckoLib
+    motivo: Verificado en Modrinth: ningún mod del pack la requiere (el stack RPG usa Armor Model API; Naturalist 2.x la eliminó).
+  - nombre: AzureLib Armor
+    motivo: El stack RPG 3.x usa Armor Model API; nada referencia a AzureLib Armor en sus dependencias.
+  - nombre: Reap (slug 'reap')
+    motivo: El slug es otro mod distinto (solo MC 26.2). Sustituido por Simple Harvest (5 KB, solo servidor).
+  - nombre: Badges Lib (slug 'badges-lib')
+    motivo: El slug no existe (404); WTHIT requiere Bad Packets ('badpackets'). Slug corregido.
+  - nombre: DeathLog
+    motivo: El slug 'deathlog' no tiene build 1.21.1 y la alternativa es diminuta; Corpse ya cubre la muerte.

@@ -27,14 +27,14 @@ El repo contenía solo el esqueleto: `modpack/modpack.yml` con `mods: []`,
 `server/.gitkeep`, un workflow que copiaba `server/` a un artefacto y una copia
 anidada duplicada `server/modpack/` (eliminada por confusa). Sobre eso se ha montado:
 
-- Manifiesto único (`modpack/modpack.yml`) con 74 mods core + 18 opcionales.
+- Manifiesto único (`modpack/modpack.yml`) con 75 mods core + 17 opcionales (revisión 2).
 - `scripts/resolver.py`: verifica compatibilidad 1.21.1/Fabric, lado y dependencias
   contra Modrinth **sin descargar nada**.
 - `scripts/construir.py`: descarga y genera `.mrpack` + pack de servidor
   (**bloqueado hasta aprobación**).
 - CI que valida y verifica en cada cambio.
 
-## 1. Librerías / dependencias (15)
+## 1. Librerías / dependencias (17)
 
 No aportan contenido; las exigen otros mods. Todas ligeras.
 
@@ -46,15 +46,17 @@ No aportan contenido; las exigen otros mods. Todas ligeras.
 | Moonlight Lib | Base de Supplementaries | ambos | 🟡 | estandar |
 | YUNG's API | Base de estructuras YUNG | servidor | 🟢 | estandar |
 | BCLib | Base de Better Nether/End | ambos | 🟡 | confirmada |
-| RebornCore | Base de Tech Reborn | ambos | 🟡 | estandar |
+| RebornCore (`reborncore`, sin guion) | Base de Tech Reborn | ambos | 🟡 | confirmada |
 | Spell Engine | Sistema de hechizos (Wizards/Archers) | ambos | 🟡 | confirmada |
-| Runes | Runas del stack RPG | ambos | 🟢 | pendiente |
-| Spell Power Attributes | Atributos de poder de hechizo | ambos | 🟢 | pendiente |
-| AzureLib Armor | Render de armaduras RPG | ambos | 🟡 | pendiente |
-| Structure Pool API | Piezas de las torres de magos | ambos | 🟢 | pendiente |
-| GeckoLib | Animaciones del stack RPG | ambos | 🟡 | pendiente |
-| playerAnimator | Animaciones de Better Combat | ambos | 🟢 | pendiente |
-| Badges Lib | Posible dependencia de WTHIT | cliente | 🟢 | pendiente |
+| Runes | Runas/munición de hechizos (Wizards) | ambos | 🟢 | confirmada |
+| Spell Power Attributes | Atributos de poder (Spell Engine) | ambos | 🟢 | confirmada |
+| Armor Model API | Túnicas/armaduras RPG vía pipeline vanilla | ambos | 🟡 | confirmada |
+| Structure Pool API | Piezas de torres (Wizards/Archers) | ambos | 🟢 | confirmada |
+| Ranged Weapon API | Arcos funcionales (Archers) | ambos | 🟢 | confirmada |
+| Trinkets | Slots de accesorios (libro de hechizos) | ambos | 🟡 | confirmada |
+| Resourceful Lib | Base de Friends and Foes | ambos | 🟡 | confirmada |
+| playerAnimator | Animaciones (Spell Engine, Better Combat, Combat Roll) | ambos | 🟢 | confirmada |
+| Bad Packets | Red de WTHIT | cliente | 🟢 | confirmada |
 
 ## 2. Optimización servidor y lógica (5)
 
@@ -91,7 +93,7 @@ Combinación estándar tipo “Fabulously Optimized”. Sin esto, 3 GB no lucen.
 | YUNG's Better Strongholds | Strongholds épicas (endgame) | servidor | 🟡* | estandar |
 | YUNG's Better Nether Fortresses | Fortalezas rediseñadas | servidor | 🟡* | estandar |
 | Structory | Estructuras con ambiente y lore ligero | servidor | 🟡* | confirmada |
-| Towns and Towers | Aldeas/puestos por bioma + barcos | ambos† | 🟡* | confirmada |
+| Towns and Towers | Aldeas/puestos por bioma + barcos | servidor | 🟡* | confirmada |
 | Better End | Reforma total del End (biomas, mobs, rituales) | ambos | 🟠 | confirmada |
 | Better Nether | Reforma total del Nether (biomas, mobs, mats.) | ambos | 🟠 | confirmada |
 | Waystones | Teletransporte entre piedras; esencial en grupo | ambos | 🟡 | confirmada |
@@ -99,7 +101,6 @@ Combinación estándar tipo “Fabulously Optimized”. Sin esto, 3 GB no lucen.
 | Xaero's Minimap | Minimapa ligero + waypoints | cliente | 🟡 | estandar |
 
 \* Solo consumen en el **servidor** durante la generación; en cliente cuestan ~0.
-† Towns and Towers va en ambos pero su worldgen solo trabaja en el servidor.
 
 ## 5. Mobs y mundo vivo (4)
 
@@ -110,7 +111,7 @@ Combinación estándar tipo “Fabulously Optimized”. Sin esto, 3 GB no lucen.
 | Corpse | Cadáver con tus objetos al morir | ambos | 🟢 | estandar |
 | Villager Names | Aldeanos con nombre; da vida al mundo | servidor | 🟢 | estandar |
 
-## 6. Magia, RPG y combate (6)
+## 6. Magia, RPG y combate (5)
 
 | Mod | Para qué sirve | Lado | Impacto | Verif. |
 | --- | --- | --- | --- | --- |
@@ -119,9 +120,8 @@ Combinación estándar tipo “Fabulously Optimized”. Sin esto, 3 GB no lucen.
 | Better Combat | Combate animado estilo Minecraft Dungeons | ambos | 🟡 | confirmada |
 | Combat Roll | Esquiva con voltereta (mismo autor; integra) | ambos | 🟡 | estandar |
 | LevelZ | Habilidades por niveles; progresión a largo plazo | ambos | 🟡 | confirmada |
-| Enchanting Infuser | Elige encantamientos pagando XP | ambos | 🟢 | pendiente |
 
-Archers comparte todas las librerías con Wizards: su coste marginal es pequeño.
+Archers comparte casi todas las librerías con Wizards (solo añade Ranged Weapon API): su coste marginal es pequeño.
 
 ## 7. Tecnología y almacenamiento (2)
 
@@ -181,7 +181,7 @@ es el único requisito especial de despliegue de todo el pack.
 | Mod | Para qué sirve | Lado | Impacto | Verif. |
 | --- | --- | --- | --- | --- |
 | FallingTree | Talar árboles enteros de golpe | ambos | 🟡 | estandar |
-| Cosecha con clic derecho | Cosechar sin replantar a mano | ambos | 🟢 | pendiente |
+| Simple Harvest | Cosecha y replanta con clic derecho | servidor | 🟢 | confirmada |
 | Leaves Be Gone | Hojas que caen rápido al talar | servidor | 🟢 | estandar |
 
 ## 13. Administración del servidor (3)
@@ -194,14 +194,20 @@ es el único requisito especial de despliegue de todo el pack.
 
 ## 14. Dependencias (resumen de verificación)
 
-Verificadas contra Modrinth en esta propuesta: Supplementaries→{Moonlight, Fabric API};
-Farmer's Delight→{Fabric API (+EMI opcional)}; Better Nether/End→{BCLib, Fabric API};
-Wizards→{Spell Engine, Runes, AzureLib Armor, Structure Pool API, Spell Power,
-GeckoLib, Fabric API}; Better Combat→{Fabric API, playerAnimator};
-Emotecraft→{Fabric API} (+playerAnimator embebido); Waystones→{Balm};
-Lootr→{Cloth Config, Fabric API}; LevelZ→{Fabric API}. El resto son estándar
-(solo Fabric API). `resolver.py` re-verifica **todo** automáticamente, incluyendo
-que no falte ninguna dependencia `required`, antes de fijar versiones.
+Cada dependencia `required` se comprobó por ID de proyecto en la API de Modrinth
+(revisión 2); no se confía en listados de terceros:
+
+- Fabric API ← todo el pack.
+- Cloth Config ← Lootr, Spell Engine, Combat Roll.
+- Balm ← Waystones, Comforts. · Moonlight ← Supplementaries. · BCLib ← Better Nether/End.
+- `reborncore` (sin guion) ← Tech Reborn. · YUNG's API ← YUNG's ×4.
+- Wizards ← {Spell Engine, Runes, Armor Model API, Structure Pool API, Fabric API}.
+- Archers ← {Spell Engine, Ranged Weapon API, Armor Model API, Structure Pool API, Fabric API}.
+- Spell Engine ← {Spell Power, Trinkets, Cloth Config, playerAnimator, Fabric API}.
+- Friends and Foes ← {Resourceful Lib, Fabric API}. · Naturalist ← {Fabric API}.
+- Better Combat ← {Fabric API, playerAnimator}; Combat Roll ← {Fabric API, Cloth Config, playerAnimator}.
+- WTHIT ← {Fabric API, Bad Packets} (cliente). · Emotecraft ← {Fabric API} (+playerAnimator embebido).
+- El resto: solo Fabric API. `resolver.py` re-verifica **todo** en CI antes de fijar versiones.
 
 ## 15. Compatibilidad entre mods (puntos revisados)
 
@@ -225,20 +231,41 @@ que no falte ninguna dependencia `required`, antes de fijar versiones.
   energía es propia y no choca con nada del pack (no hay otros mods tech).
 - **Expanded Storage (archivado)**: riesgo bajo con versión fijada; si preocupa, se
   retira y queda Tech Reborn + vanilla (ver §7).
+- **Armor Model API**: el stack RPG 3.x dibuja túnicas por el pipeline vanilla
+  (compatible con Sodium/Iris por diseño); no hacen falta GeckoLib ni AzureLib.
+- **Towns and Towers solo-servidor**: Modrinth lo marca servidor-requerido y
+  cliente-opcional; moverlo al servidor ahorra megas en clientes de 3 GB.
+- **Bad Packets**: librería de red exigida por WTHIT; viaja solo en cliente con él.
+- **Trinkets**: exigido por Spell Engine (slot del libro de hechizos); estándar
+  de Fabric con versión 1.21.1.
 
-## 16. Estimación de RAM (aprox., orientativa)
+## 16. Estimación de RAM y veredicto de carga (revisión 2)
+
+Tamaños de `.jar` verificados (los más grandes): Naturalist 11,3 MB · Tech Reborn
+6,4 MB · Simple Voice Chat 6,3 MB · Friends and Foes 5,1 MB · Spell Engine 4,7 MB ·
+Wizards 4,5 MB · Farmer's Delight 2,9 MB · Terralith 2,8 MB · Another Furniture
+2,3 MB. Total a descargar por cliente ≈ 65–75 MB (una sola vez).
 
 - **Cliente (3 GB)**: base 1.21.1/Fabric ≈ 1,2–1,5 GB + contenido ≈ 0,8–1,1 GB −
-  ahorro de FerriteCore/Sodium. **Cabe en 3 GB** con margen si no se añaden shaders
-  ni packs de texturas pesados. El mayor coste cliente: Better Nether/End, Naturalist,
-  Tech Reborn, Wizards y EMI (caché de recetas).
-- **Servidor (4 GB)**: base ≈ 1 GB + worldgen (Terralith/YUNG's) y entidades con
-  4–6 jugadores ≈ 1,5–2,5 GB. **Cabe en 4 GB** con: pre-generación (Chunky, radio
-  3k–5k), `view-distance` 6–8, `simulation-distance` 4–6 y flags G1GC/Aikar.
-- Cuello de botella esperado: **generación de chunks al explorar** (se mitiga con
-  Chunky + Noisium), no la RAM en reposo.
+  ahorro de FerriteCore/Sodium. **Veredicto: CABE con margen** (~2–2,6 GB en juego
+  normal). Los 6 únicos 🟠 (Terralith*, Better Nether/End, Naturalist, Wizards,
+  Tech Reborn) no pican a la vez: *Terralith solo trabaja en servidor. Condición:
+  sin shaders ni packs HD (Iris queda opcional).
+- **Servidor (4 GB)**: base ≈ 1 GB + worldgen y entidades (4–6 jugadores) ≈
+  1,5–2,5 GB. **Veredicto: CABE** con pre-generación Chunky (radio 3k–5k),
+  `view-distance` 6–8, `simulation-distance` 4–6 y flags G1GC/Aikar. El combo
+  Terralith + YUNG's ×4 + Structory + T&T es viable: las estructuras solo cuestan
+  al generar el chunk (checks baratos + eventos raros); Terralith es el único coste
+  por chunk y Better Nether/End solo consumen dentro de su dimensión.
+- Costes singulares revisados: **Naturalist** (11,3 MB de assets, 🟠) aporta 47
+  animales dentro de los mob caps vanilla — variedad, no cantidad —; **Wizards**
+  (4,5 MB + stack compartido ≈ 12–14 MB en total, 🟠) es la única magia seria en
+  Fabric 1.21.1; **Tech Reborn** (6,4 MB, 🟠) es el único tech en Fabric 1.21.1 con
+  red de energía propia y sin conflictos. Los tres se quedan: pilar de contenido.
+- Cuello de botella esperado: **generación de chunks al explorar** (Chunky +
+  Noisium lo mitigan), no la RAM en reposo.
 
-## 17. Opcionales (18, no incluidos salvo petición)
+## 17. Opcionales (17, no incluidos salvo petición)
 
 | Mod | Lado | Por qué es opcional |
 | --- | --- | --- |
@@ -248,13 +275,12 @@ que no falte ninguna dependencia `required`, antes de fijar versiones.
 | Sound Physics Remastered | cliente | Reverberación; combina con el chat de voz |
 | Presence Footsteps | cliente | Pasos según superficie; atmósfera gratis |
 | Not Enough Animations | cliente | Animaciones en 1.ª persona |
-| Eating Animation | cliente | Animación al comer (pendiente de verificar) |
+| Eating Animation | cliente | Animación al comer (verificada; cliente puro) |
 | Tectonic | servidor | Terreno aún más épico, pero sube coste de generación |
-| Chipped (+ Architectury) | ambos | Miles de variantes; pesa en cliente (texturas) |
+| Chipped (+ Architectury) | ambos | Miles de variantes (jar 14,3 MB); solo si sobra RAM |
 | Macaw's Doors/Windows/Roofs | ambos | Más deco si se quiere variedad extra |
 | LuckPerms | servidor | Solo si hacen falta rangos más allá de OP |
 | No Chat Reports | ambos | Quita reportes a Mojang (servidor privado) |
-| DeathLog | servidor | Historial de muertes (pendiente de verificar) |
 | ServerCore | servidor | Solo si Lithium no bastara; solapa parcial |
 
 Los opcionales de **cliente** no rompen la paridad: cada jugador puede añadirlos
@@ -286,10 +312,16 @@ o no por su cuenta.
 | VMP | Para cientos de jugadores; overkill |
 | Architectury (core) | Nadie del core la pide; no añadir peso muerto |
 | Essential Mod | Servicio externo cerrado; no encaja con servidor propio |
+| Enchanting Infuser | Pide Puzzles Lib + Forge Config API Port para un lujo menor |
+| GeckoLib | Nada del pack la requiere (verificado por IDs) |
+| AzureLib Armor | El stack RPG usa Armor Model API |
+| Reap (`reap`) | Slug erróneo: es otro mod (solo MC 26.2) → Simple Harvest |
+| Badges Lib (`badges-lib`) | Slug inexistente (404) → Bad Packets |
+| DeathLog | Sin build 1.21.1; Corpse cubre la necesidad |
 
 ## 19. Decisiones que necesito de ti
 
-1. **Aprobar / recortar / cambiar** esta selección (74 core + 18 opcionales).
+1. **Aprobar / recortar / cambiar** esta selección (75 core + 17 opcionales, rev 2).
 2. **Simple Voice Chat**: ¿OK abrir un puerto UDP en el servidor? (Si no, se quita.)
 3. **Expanded Storage**: ¿aceptas el mod archivado (v1.21.1 estable fijada) o lo
    quitamos y queda Tech Reborn + vanilla?
@@ -304,3 +336,13 @@ o no por su cuenta.
 3. `resolver.py --guardar` fija versiones exactas (CI lo verifica antes).
 4. `construir.py` genera `.mrpack` + `servidor.zip`.
 5. Probar en local, y **solo entonces** hablar de despliegue.
+
+## 21. Historial de revisiones
+
+- **Rev 1**: propuesta inicial (74 core + 18 opcionales).
+- **Rev 2**: revisión de rendimiento/estabilidad. Verificados todos los slugs y
+  dependencias `required` por ID en la API de Modrinth. Eliminados: Enchanting
+  Infuser, GeckoLib, AzureLib Armor, Reap, Badges Lib, DeathLog. Añadidos:
+  Armor Model API, Ranged Weapon API, Trinkets, Resourceful Lib, Bad Packets,
+  Simple Harvest. Corregidos: `reborncore` (slug), Towns and Towers → solo
+  servidor. Resultado: 75 core + 17 opcionales, 0 pendientes en core.
