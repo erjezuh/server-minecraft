@@ -57,12 +57,12 @@ mods:
     notas: Requerida por Supplementaries.
   - slug: yungs-api
     nombre: YUNG's API
-    lado: servidor
+    lado: ambos
     categoria: libreria
     impacto: despreciable
-    verificacion: estandar
+    verificacion: confirmada
     estado: propuesto
-    notas: Requerida por los mods de estructuras de YUNG (solo servidor).
+    notas: Requerida por los mods de estructuras de YUNG. Modrinth la marca ambos lados.
   - slug: cristel-lib
     nombre: Cristel Lib
     lado: servidor
@@ -71,6 +71,46 @@ mods:
     verificacion: confirmada
     estado: propuesto
     notas: Requerida por Towns and Towers (configs de estructuras). Solo servidor.
+  - slug: libz
+    nombre: LibZ
+    lado: ambos
+    categoria: libreria
+    impacto: despreciable
+    verificacion: confirmada
+    estado: propuesto
+    notas: Requerida por LevelZ. Ambos lados.
+  - slug: worldweaver
+    nombre: WorldWeaver
+    lado: ambos
+    categoria: libreria
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Requerida por BCLib/BetterNether/BetterEnd (sucesora de BCLib). Solo hay alpha para 1.21.1.
+  - slug: lithostitched
+    nombre: Lithostitched
+    lado: servidor
+    categoria: libreria
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Requerida por Terralith (worldgen). Solo servidor.
+  - slug: yacl
+    nombre: YetAnotherConfigLib
+    lado: cliente
+    categoria: libreria
+    impacto: despreciable
+    verificacion: confirmada
+    estado: propuesto
+    notas: Requerida por Debugify (pantallas de config). Solo cliente.
+  - slug: bundle-api
+    nombre: Bundle API
+    lado: ambos
+    categoria: libreria
+    impacto: despreciable
+    verificacion: confirmada
+    estado: propuesto
+    notas: Requerida por Runes. Ambos lados.
   - slug: bclib
     nombre: BCLib
     lado: ambos
@@ -204,10 +244,10 @@ mods:
     notas: Reduce uso de RAM. Clave para 3 GB en cliente y 4 GB en servidor.
   - slug: noisium
     nombre: Noisium
-    lado: ambos
+    lado: servidor
     categoria: optimizacion
     impacto: mejora
-    verificacion: estandar
+    verificacion: confirmada
     estado: propuesto
     notas: Acelera generación de mundo (importante con Terralith + YUNG's).
   - slug: alternate-current
@@ -580,14 +620,6 @@ mods:
     verificacion: estandar
     estado: propuesto
     notas: Muestra loot de cofres/mobs en EMI.
-  - slug: emi-trades
-    nombre: EMI Trades
-    lado: cliente
-    categoria: qol
-    impacto: despreciable
-    verificacion: estandar
-    estado: propuesto
-    notas: Muestra tradeos de aldeanos en EMI.
   - slug: wthit
     nombre: WTHIT
     lado: cliente
@@ -791,6 +823,14 @@ opcionales:
     verificacion: estandar
     estado: propuesto
     notas: Optimizaciones extra + utilidades. Solo si Lithium no basta; solapa parcial.
+  - slug: emi-trades-reborn
+    nombre: EMI Trades Reborn
+    lado: cliente
+    categoria: qol
+    impacto: despreciable
+    verificacion: estandar
+    estado: propuesto
+    notas: Fork no oficial de EMI Trades para 1.21.1. Muy poco uso (282 descargas); opcional.
 
 # =====================================================================
 # DESCARTADOS: documentados para no re-añadirlos sin motivo.
@@ -866,3 +906,5 @@ descartados:
     motivo: Sin build 1.21.1 (llega solo a 1.21, abandonado en 2024). Capricho menor; no compensa estirar versiones.
   - nombre: Nature's Compass (slug 'nature-s-compass')
     motivo: Slug inexistente (404); el correcto es 'natures-compass'. Slug corregido.
+  - nombre: EMI Trades
+    motivo: Sin build 1.21.1 (llega a 1.20.4); el slug 'emi-trades' no existe en Modrinth. Fork Reborn sin verificar (ver opcionales).

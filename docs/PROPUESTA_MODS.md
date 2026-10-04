@@ -27,14 +27,14 @@ El repo contenía solo el esqueleto: `modpack/modpack.yml` con `mods: []`,
 `server/.gitkeep`, un workflow que copiaba `server/` a un artefacto y una copia
 anidada duplicada `server/modpack/` (eliminada por confusa). Sobre eso se ha montado:
 
-- Manifiesto único (`modpack/modpack.yml`) con 81 mods core + 10 opcionales (revisión 3, 3 jugadores).
+- Manifiesto único (`modpack/modpack.yml`) con 86 mods core + 11 opcionales (revisión 3.2, 3 jugadores).
 - `scripts/resolver.py`: verifica compatibilidad 1.21.1/Fabric, lado y dependencias
   contra Modrinth **sin descargar nada**.
 - `scripts/construir.py`: descarga y genera `.mrpack` + pack de servidor
   (**bloqueado hasta aprobación**).
 - CI que valida y verifica en cada cambio.
 
-## 1. Librerías / dependencias (18)
+## 1. Librerías / dependencias (24)
 
 No aportan contenido; las exigen otros mods. Todas ligeras.
 
@@ -44,7 +44,13 @@ No aportan contenido; las exigen otros mods. Todas ligeras.
 | Cloth Config API | Configuraciones (Lootr, otros) | ambos | 🟢 | estandar |
 | Balm | Base de Waystones y Comforts | ambos | 🟢 | estandar |
 | Moonlight Lib | Base de Supplementaries | ambos | 🟡 | estandar |
-| YUNG's API | Base de estructuras YUNG | servidor | 🟢 | estandar |
+| YUNG's API | Base de estructuras YUNG | ambos | 🟢 | confirmada |
+| Cristel Lib | Configs de estructuras (Towns and Towers) | servidor | 🟢 | confirmada |
+| LibZ | Base de LevelZ | ambos | 🟢 | confirmada |
+| WorldWeaver | Base de BCLib/BetterNether/BetterEnd | ambos | 🟡 | confirmada |
+| Lithostitched | Worldgen de Terralith | servidor | 🟢 | confirmada |
+| YACL | Pantallas de config (Debugify) | cliente | 🟢 | confirmada |
+| Bundle API | Base de Runes | ambos | 🟢 | confirmada |
 | BCLib | Base de Better Nether/End | ambos | 🟡 | confirmada |
 | RebornCore (`reborncore`, sin guion) | Base de Tech Reborn | ambos | 🟡 | confirmada |
 | Spell Engine | Sistema de hechizos (Wizards/Archers) | ambos | 🟡 | confirmada |
@@ -169,13 +175,12 @@ defecto): es el requisito principal de despliegue. Además, Universal Graves usa
 Polymer AutoHost: los 3 jugadores aceptan el resource pack del servidor al entrar
 (un clic, mecanismo vanilla).
 
-## 11. Calidad de vida e inmersión en cliente (11)
+## 11. Calidad de vida e inmersión en cliente (10)
 
 | Mod | Para qué sirve | Lado | Impacto | Verif. |
 | --- | --- | --- | --- | --- |
 | EMI | Visor de recetas (más ligero que REI) | cliente | 🟡 | estandar |
 | EMI Loot | Loot de cofres/mobs dentro de EMI | cliente | 🟢 | estandar |
-| EMI Trades | Tradeos de aldeanos dentro de EMI | cliente | 🟢 | estandar |
 | WTHIT | Info del bloque al mirar (alt. Fabric de Jade) | cliente | 🟢 | estandar |
 | Shulker Box Tooltip | Ver dentro de shulkers sin abrirlas | cliente | 🟢 | estandar |
 | Mouse Tweaks | Arrastrar/mover objetos con el ratón | cliente | 🟢 | estandar |
@@ -209,7 +214,7 @@ Cada dependencia `required` se comprobó por ID de proyecto en la API de Modrint
 - Fabric API ← todo el pack.
 - Cloth Config ← Lootr, Spell Engine, Combat Roll.
 - Balm ← Waystones, Comforts. · Moonlight ← Supplementaries. · BCLib ← Better Nether/End.
-- `reborncore` (sin guion) ← Tech Reborn. · YUNG's API ← YUNG's ×4.
+- `reborncore` (sin guion) ← Tech Reborn. · YUNG's API ← YUNG's ×4. · Cristel Lib ← Towns and Towers. · LibZ ← LevelZ. · WorldWeaver ← BCLib/BetterNether/BetterEnd. · Lithostitched ← Terralith. · YACL ← Debugify. · Bundle API ← Runes.
 - Wizards ← {Spell Engine, Runes, Armor Model API, Structure Pool API, Fabric API}.
 - Archers ← {Spell Engine, Ranged Weapon API, Armor Model API, Structure Pool API, Fabric API}.
 - Spell Engine ← {Spell Power, Trinkets, Cloth Config, playerAnimator, Fabric API}.
@@ -256,14 +261,15 @@ Cada dependencia `required` se comprobó por ID de proyecto en la API de Modrint
   diera guerra, se retira sin tocar el servidor (es solo cliente).
 - **Almacén sin mod dedicado**: TR Quantum + vanilla; cero riesgo de abandonos.
 
-## 16. Estimación de RAM y veredicto de carga (revisión 2)
+## 16. Estimación de RAM y veredicto de carga (revisión 3.2)
 
 Tamaños de `.jar` verificados (los más grandes): Naturalist 11,3 MB · Tech Reborn
 6,4 MB · Simple Voice Chat 6,3 MB · Presence Footsteps 5,7 MB (sonidos) ·
 Friends and Foes 5,1 MB · Spell Engine 4,7 MB · Wizards 4,5 MB · Farmer's Delight
 2,9 MB · Terralith 2,8 MB · Another Furniture 2,3 MB · Macaw's ×3 ≈ 4,2 MB ·
-Xaero's World Map 1,5 MB · Universal Graves 1,7 MB* (*solo servidor). Total por
-cliente ≈ 75–90 MB (una sola vez).
+Xaero's World Map 1,5 MB · Universal Graves 1,7 MB* (*solo servidor) ·
+WorldWeaver 2,4 MB · YACL 1,1 MB · Lithostitched 0,9 MB*. Total por
+cliente ≈ 80–95 MB (una sola vez).
 
 - **Cliente (3 GB)**: base 1.21.1/Fabric ≈ 1,2–1,5 GB + contenido ≈ 0,8–1,1 GB −
   ahorro de FerriteCore/Sodium. **Veredicto: CABE con margen** (~2–2,6 GB en juego
@@ -284,7 +290,7 @@ cliente ≈ 75–90 MB (una sola vez).
 - Cuello de botella esperado: **generación de chunks al explorar** (Chunky +
   Noisium lo mitigan), no la RAM en reposo.
 
-## 17. Opcionales (10, no incluidos salvo petición)
+## 17. Opcionales (11, no incluidos salvo petición)
 
 | Mod | Lado | Por qué es opcional |
 | --- | --- | --- |
@@ -296,6 +302,7 @@ cliente ≈ 75–90 MB (una sola vez).
 | LuckPerms | servidor | Solo si hacen falta rangos más allá de OP |
 | No Chat Reports | ambos | Quita reportes a Mojang (servidor privado) |
 | ServerCore | servidor | Solo si Lithium no bastara; solapa parcial |
+| EMI Trades Reborn | cliente | Fork 1.21.1 de EMI Trades; solo 282 descargas, sin verificar a fondo |
 
 Los opcionales de **cliente** no rompen la paridad: cada jugador puede añadirlos
 o no por su cuenta.
@@ -314,6 +321,7 @@ o no por su cuenta.
 | Epic Fight | Solo Forge/NeoForge → Better Combat + Combat Roll |
 | Jade | En Fabric se usa WTHIT |
 | REI | Duplica a EMI siendo más pesado (pide Architectury) |
+| EMI Trades | Sin build 1.21.1 (llega a 1.20.4); slug inexistente. Fork Reborn en opcionales |
 | JourneyMap | Mucho más pesado que Xaero's |
 | Drawers / Sophisticated / Tom's | Forge/NeoForge o sin port → Expanded Storage |
 | Functional Storage | Sin Fabric oficial 1.21.1; port no oficial diminuto y arriesgado |
@@ -339,7 +347,7 @@ o no por su cuenta.
 
 ## 19. Decisiones que necesito de ti
 
-1. **Aprobar / recortar / cambiar** esta selección (81 core + 10 opcionales, rev 3).
+1. **Aprobar / recortar / cambiar** esta selección (86 core + 11 opcionales, rev 3.2).
 2. **Simple Voice Chat**: ✅ se queda; documentado requisito UDP 24454.
 3. **Expanded Storage**: ✅ eliminado por archivado; almacén via TR + vanilla.
 4. **Opcionales**: ✅ triage hecho — promocionan World Map, Sound Physics,
@@ -370,3 +378,13 @@ o no por su cuenta.
   Macaw's ×3. Nuevos: Universal Graves + Polymer (sustituyen a Corpse, 100%
   servidor). Corregido slug `natures-compass`. SVC confirmado con UDP 24454.
   Resultado: 81 core + 10 opcionales, 0 pendientes en core.
+- **Rev 3.1**: fix CI + dependencia descubierta. Entrecomillados valores YAML
+  con dos puntos (rompían el parseo), `resolver.py` usa el entorno del proyecto
+  (+ flag `lado_verificado_manual`) y añadida Cristel Lib (`required` por
+  Towns and Towers). Anotaciones `::error::` para depurar el CI sin logs.
+- **Rev 3.2**: dependencias que pedía el CI. Nuevas: LibZ (← LevelZ),
+  WorldWeaver (← BCLib/BetterNether/BetterEnd, solo hay alpha para 1.21.1),
+  Lithostitched (← Terralith), YACL (← Debugify), Bundle API (← Runes).
+  Lados corregidos: Noisium → servidor, YUNG's API → ambos. EMI Trades sale
+  del core (sin build 1.21.1; el slug no existe) y su fork Reborn pasa a
+  opcionales. Resultado: 86 core + 11 opcionales, 0 pendientes en core.
