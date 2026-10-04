@@ -194,9 +194,10 @@ def main() -> int:
             bloques.append(actual)
             continue
         if actual is not None:
-            m = re.match(r"\s*-\s+([A-Za-z0-9_.\-]+)\s+(.+)$", ln)
+            # Entradas top-level ("- modid version") y anidadas ("|-- modid version").
+            m = re.match(r"\s*(?:\|--?|\\--?|-)\s*([A-Za-z0-9_.\-]+)(?:\s+(.+))?$", ln)
             if m:
-                actual.append((m.group(1), m.group(2).strip()[:64]))
+                actual.append((m.group(1), (m.group(2) or "?").strip()[:64]))
             elif ln.strip():
                 actual = None
     modids = dict(max(bloques, key=len)) if bloques else {}
