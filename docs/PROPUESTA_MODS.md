@@ -268,13 +268,15 @@ Cada dependencia `required` se comprobó por ID de proyecto en la API de Modrint
 
 ## 16. Estimación de RAM y veredicto de carga (revisión 3.2)
 
-Tamaños de `.jar` verificados (los más grandes): Naturalist 11,3 MB · Tech Reborn
-6,4 MB · Simple Voice Chat 6,3 MB · Presence Footsteps 5,7 MB (sonidos) ·
-Friends and Foes 5,1 MB · Spell Engine 4,7 MB · Wizards 4,5 MB · Farmer's Delight
-2,9 MB · Terralith 2,8 MB · Another Furniture 2,3 MB · Macaw's ×3 ≈ 4,2 MB ·
-Xaero's World Map 1,5 MB · Universal Graves 1,7 MB* (*solo servidor) ·
-WorldWeaver 2,4 MB · YACL 1,1 MB · Lithostitched 0,9 MB*. Total por
-cliente ≈ 80–95 MB (una sola vez).
+Tamaños de `.jar` verificados (los más grandes): Better End 93 MB · Better Nether
+23 MB · Ledger 20,5 MB* · Naturalist 11,3 MB · Tech Reborn 6,4 MB ·
+Simple Voice Chat 6,3 MB · Presence Footsteps 5,7 MB (sonidos) · Friends and Foes
+5,1 MB · Spell Engine 4,7 MB · Wizards 4,5 MB · Farmer's Delight 2,9 MB ·
+Terralith 2,8 MB* · Another Furniture 2,3 MB · Macaw's ×3 ≈ 4,2 MB ·
+WorldWeaver 2,4 MB · Xaero's World Map 1,5 MB · Universal Graves 1,7 MB* ·
+YACL 1,1 MB · Lithostitched 0,9 MB* (* = solo va en servidor). Total por
+cliente ≈ 190–210 MB y en servidor ≈ 200–220 MB (una sola vez; cifras exactas
+en `docs/INFORME_BUILD.md` tras la construcción).
 
 - **Cliente (3 GB)**: base 1.21.1/Fabric ≈ 1,2–1,5 GB + contenido ≈ 0,8–1,1 GB −
   ahorro de FerriteCore/Sodium. **Veredicto: CABE con margen** (~2–2,6 GB en juego

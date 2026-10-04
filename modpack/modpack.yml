@@ -19,7 +19,7 @@ minecraft: "1.21.1"
 loader: "fabric"
 modpack_nombre: "Karmaland"
 modpack_version: "1.0.0"
-estado_global: propuesto
+estado_global: aprobado
 
 mods:
   # ---------------- Librerías / dependencias (no aportan contenido) ----------------

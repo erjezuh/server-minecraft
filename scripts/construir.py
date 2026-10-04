@@ -14,6 +14,7 @@ No hace NADA si el manifiesto sigue en estado 'propuesto'.
 """
 
 import argparse
+import hashlib
 import json
 import sys
 import urllib.request
@@ -37,10 +38,22 @@ def api_get(path: str):
         return json.load(r)
 
 
-def descargar(url: str, destino: Path, tamano: int | None = None):
+def sha512_de(path: Path) -> str:
+    h = hashlib.sha512()
+    with open(path, "rb") as f:
+        for bloque in iter(lambda: f.read(1024 * 256), b""):
+            h.update(bloque)
+    return h.hexdigest()
+
+
+def descargar(url: str, destino: Path, tamano: int | None = None, sha512: str | None = None):
     destino.parent.mkdir(parents=True, exist_ok=True)
-    if destino.exists() and tamano and destino.stat().st_size == tamano:
-        return False  # ya estaba
+    if destino.exists():
+        ok = (not tamano or destino.stat().st_size == tamano)
+        ok = ok and (not sha512 or sha512_de(destino) == sha512)
+        if ok:
+            return False  # ya estaba y cuadra
+        destino.unlink()  # corrupto o distinto: re-descargar
     req = urllib.request.Request(url, headers=UA)
     with urllib.request.urlopen(req, timeout=120) as r, open(destino, "wb") as f:
         while True:
@@ -48,6 +61,12 @@ def descargar(url: str, destino: Path, tamano: int | None = None):
             if not bloque:
                 break
             f.write(bloque)
+    if tamano and destino.stat().st_size != tamano:
+        destino.unlink()
+        sys.exit(f"ERROR: {destino.name} descargado con tamaño incorrecto.")
+    if sha512 and sha512_de(destino) != sha512:
+        destino.unlink()
+        sys.exit(f"ERROR: {destino.name} no cuadra su sha512 (descarga corrupta).")
     return True
 
 
@@ -95,7 +114,7 @@ def main():
             sys.exit(f"ERROR: {slug} no tiene .jar en la versión fijada.")
         prim = next((f for f in candidatos if f.get("primary")), candidatos[0])
         destino = mods_dir / prim["filename"]
-        nuevo = descargar(prim["url"], destino, prim.get("size"))
+        nuevo = descargar(prim["url"], destino, prim.get("size"), prim.get("hashes", {}).get("sha512"))
         lado_por_fichero[prim["filename"]] = pin["lado"]
         print(f"  {'↓' if nuevo else '='} {prim['filename']} ({prim.get('size', 0) // 1024} KiB)")
         ficheros_mrpack.append({
@@ -108,7 +127,9 @@ def main():
 
     # --- .mrpack para clientes (Modrinth App / Prism / MultiMC) ---
     nombre = f"{m.get('modpack_nombre', 'modpack')}-{m.get('modpack_version', '1.0.0')}"
-    loader_v = loader_fabric(m["minecraft"], args.fabric_loader)
+    fijado = args.fabric_loader or res.get("fabric_loader")
+    loader_v = fijado or loader_fabric(m["minecraft"], None)
+    print(f"fabric-loader: {loader_v}" + (" (fijado)" if fijado else " (último estable; se registrará en el lockfile)"))
     indice = {"formatVersion": 1, "game": "minecraft", "versionId": m.get("modpack_version", "1.0.0"),
               "name": m.get("modpack_nombre", "modpack"),
               "dependencies": {"minecraft": m["minecraft"], "fabric-loader": loader_v},
@@ -118,9 +139,13 @@ def main():
         z.writestr("modrinth.index.json", json.dumps(indice, indent=2))
         z.writestr("overrides/LEEME.txt",
                    f"{nombre} — pack generado automáticamente. Asigna 3 GB de RAM (-Xmx3G).\n")
+        n_cli = 0
         for f in sorted(mods_dir.glob("*.jar")):
+            if lado_por_fichero.get(f.name, "ambos") == "servidor":
+                continue  # el cliente no lleva mods exclusivos de servidor
             z.write(f, f"overrides/mods/{f.name}")
-    print(f"✔ Cliente: {mrpack} (fabric-loader {loader_v}, {len(ficheros_mrpack)} mods)")
+            n_cli += 1
+    print(f"✔ Cliente: {mrpack} (fabric-loader {loader_v}, índice {len(ficheros_mrpack)} mods, {n_cli} .jar de cliente/ambos)")
 
     # --- Pack de servidor (sin mods exclusivos de cliente) ---
     srv = salida / "servidor"
