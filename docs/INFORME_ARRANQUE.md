@@ -1,11 +1,11 @@
 # Informe de arranque — servidor 1.0.0 (1.21.1 + fabric)
 
-- Fecha (UTC): 2026-10-04 22:05 UTC.
+- Fecha (UTC): 2026-10-04 22:14 UTC.
 - Entorno limpio (CI): openjdk version "21.0.12.1" 2026-08-18 LTS; installer 1.1.2; loader 0.19.5; JVM -Xms1G -Xmx4G; nogui.
-- Resultado: **LISTO ✔**
+- Resultado: **FALLO ❌**
 - Tiempo hasta listo: 55s; parada limpia: sí (exit 0).
-- Memoria: pico RSS ≈ 1712 MB con heap limitado a 4G.
-- Mods detectados en Fabric Loader: 118 (esperados en servidor: 68).
+- Memoria: pico RSS ≈ 2291 MB con heap limitado a 4G.
+- Mods detectados en Fabric Loader: 174 (esperados en servidor: 68).
 - Líneas de error únicas: 137; WARN: 19; crash-reports: 0.
 
 ## Checks
@@ -13,7 +13,7 @@
 - ✔ Llegó a listo (`Done (`).
 - ✔ Parada limpia con `stop` (exit 0).
 - ✔ Sin crash-reports.
-- ✔ Ningún mod de cliente cargado (0 de 23).
+- ❌ Ningún mod de cliente cargado: placeholder-api
 
 ## Spotlight
 
@@ -21,17 +21,17 @@
 | --- | --- | --- |
 | betterend | cargado | betterend |
 | betternether | cargado | betternether |
-| terralith | mencionado | en log |
-| wizards | mencionado | en log |
-| techreborn | mencionado | en log |
-| universal-graves | mencionado | en log |
+| terralith | cargado | terralith |
+| wizards | cargado | wizards |
+| techreborn | cargado | techreborn |
+| universal-graves | cargado | universal-graves |
 | polymer | mencionado | en log |
 | simple-voice-chat | mencionado | en log |
 | yungs-better-dungeons | mencionado | en log |
 | yungs-better-mineshafts | mencionado | en log |
 | yungs-better-strongholds | mencionado | en log |
 | yungs-better-nether-fortresses | mencionado | en log |
-| structory | mencionado | en log |
+| structory | cargado | structory |
 | towns-and-towers | SIN SEÑAL | aviso |
 | lithostitched | cargado | lithostitched |
 | cristel-lib | cargado | cristellib |
@@ -65,9 +65,12 @@
 - `codecui` 1.21.1-1.4.5
 - `com_electronwill_night-config_core` 3.8.0
 - `com_electronwill_night-config_toml` 3.8.0
+- `com_teamresourceful_bytecodecs` 1.1.2
+- `com_teamresourceful_yabn` 1.0.3
 - `com_velocitypowered_velocity-native` 3.3.0-SNAPSHOT
 - `combat_roll` 2.0.6+1.21.1
 - `comforts` 9.0.5+1.21.1
+- `common-protection-api` 1.0.0
 - `cristellib` 3.1.7
 - `de_marhali_json5-java` 3.0.0
 - `emi_loot` 0.7.9+1.21+fabric
@@ -134,11 +137,13 @@
 - `mcwwindows` 2.4.2
 - `minecraft` 1.21.1
 - `mixinextras` 0.5.5
+- `mixinsquared` 0.1.1
 - `moonlight` 1.21.1-3.7.0
 - `naturalist` 2.0.5
 - `naturescompass` 1.21.1-2.6.0-fabric
 - `net_peanuuutz_tomlkt_tomlkt-jvm` 0.3.7
 - `noisium` 2.3.0+mc1.21-1.21.1
+- `org_javassist_javassist` 3.29.2-GA
 - `org_jetbrains_kotlin_kotlin-reflect` 2.4.20
 - `org_jetbrains_kotlin_kotlin-stdlib` 2.4.20
 - `org_jetbrains_kotlin_kotlin-stdlib-jdk7` 2.4.20
@@ -153,12 +158,63 @@
 - `org_jetbrains_kotlinx_kotlinx-serialization-core-jvm` 1.11.0
 - `org_jetbrains_kotlinx_kotlinx-serialization-json-jvm` 1.11.0
 - `org_reflections_reflections` 0.10.2
+- `packet_tweaker` 0.5.6+1.21
+- `placeholder-api` 2.4.1+1.21
 - `playeranimator` 2.0.4+1.21.1
 - `polymer-autohost` 0.9.19+1.21.1
+- `polymer-blocks` 0.9.19+1.21.1
 - `polymer-bundled` 0.9.19+1.21.1
+- `polymer-common` 0.9.19+1.21.1
+- `polymer-core` 0.9.19+1.21.1
+- `polymer-resource-pack` 0.9.19+1.21.1
+- `polymer-virtual-entity` 0.9.19+1.21.1
+- `predicate-api` 0.5.1+1.21
+- `puzzleslib` 21.1.62
+- `ranged_weapon_api` 3.0.0+1.21.1
+- `reborncore` 5.11.19
+- `resourcefullib` 3.0.12
+- `right_click_harvest` 1.0.0-1.21.x
+- `runes` 1.3.2+1.21.1
+- `sablecompanion` 1.6.0
 - `server_translations_api` 2.3.1+1.21-pre2
+- `sgui` 1.6.0+1.21
+- `spark` 1.10.109
 - `spectrelib` 0.17.2+1.21
+- `spell_engine` 1.10.9+1.21.1
+- `spell_power` 1.6.0+1.21.1
+- `structory` 1.3.17
+- `structure_pool_api` 1.2.1+1.21.1
+- `supplementaries` 1.21.1-3.9.9
+- `t_and_t` 1.13.11
+- `team_reborn_energy` 4.1.0
+- `techreborn` 5.11.19
+- `terralith` 2.6.2
 - `tiny_config` 3.1.0
+- `trinkets` 3.10.0
+- `universal-graves` 3.4.4+1.21
+- `voicechat` 1.21.1-2.6.22
+- `voicechat_api` 2.6.20
+- `waystones` 21.1.46
+- `wizards` 3.1.3+1.21.1
+- `wover` 21.0.13
+- `wover-biome` 21.0.13
+- `wover-block` 21.0.13
+- `wover-common` 21.0.13
+- `wover-core` 21.0.13
+- `wover-datagen` 21.0.13
+- `wover-events` 21.0.13
+- `wover-feature` 21.0.13
+- `wover-generator` 21.0.13
+- `wover-item` 21.0.13
+- `wover-math` 21.0.13
+- `wover-preset` 21.0.13
+- `wover-recipe` 21.0.13
+- `wover-structure` 21.0.13
+- `wover-surface` 21.0.13
+- `wover-tag` 21.0.13
+- `wover-ui` 21.0.13
+- `wunderlib` 21.0.8
+- `yungsapi` 1.21.1-Fabric-5.1.9
 
 ## Líneas de error únicas (137)
 
@@ -166,94 +222,94 @@
 - `- Mod 'Friends&Foes' (friendsandfoes) 4.0.27 recommends any version of yet_another_config_lib_v3, which is missing!`
 - `- Mod 'Friends&Foes' (friendsandfoes) 4.0.27 recommends any version of modmenu, which is missing!`
 - `|-- fabric-crash-report-info-v1 0.2.29+0af3f5a719`
-- `[22:03:59] [main/WARN]: Error loading class: traben/entity_model_features/models/animation/EMFAnimationEntityContext (java.lang.ClassNotFoundException: traben/entity_model_features/models/animation/EMFAnimationEntityCont`
-- `[22:03:59] [main/WARN]: Error loading class: com/electronwill/nightconfig/core/io/IoUtils (java.lang.ClassNotFoundException: com/electronwill/nightconfig/core/io/IoUtils)`
-- `[22:03:59] [main/WARN]: Error loading class: com/simibubi/create/content/schematics/SchematicPrinter (java.lang.ClassNotFoundException: com/simibubi/create/content/schematics/SchematicPrinter)`
-- `[22:03:59] [main/WARN]: Error loading class: net/minecraft/class_525 (java.lang.ClassNotFoundException: net/minecraft/class_525)`
-- `[22:04:00] [main/WARN]: Error loading class: net/caffeinemc/mods/sodium/client/render/chunk/compile/pipeline/DefaultFluidRenderer (java.lang.ClassNotFoundException: net/caffeinemc/mods/sodium/client/render/chunk/compile/`
-- `[22:04:00] [main/WARN]: Error loading class: com/simibubi/create/content/kinetics/base/BlockBreakingKineticBlockEntity (java.lang.ClassNotFoundException: com/simibubi/create/content/kinetics/base/BlockBreakingKineticBloc`
-- `[22:04:09] [main/ERROR]: No data fixer registered for spirit_wolf`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:alligator`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:ant`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:anglerfish`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:ray`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:blobfish`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:piranha`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:bass`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:bear`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:black_bear`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:bird`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:boar`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:butterfly`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:capybara`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:caterpillar`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:catfish`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:clam`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:crab`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:deer`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:dragonfly`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:duck`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:duck_egg`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:dirt_trail`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:carried_food`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:elephant`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:firefly`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:giant_isopod`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:giraffe`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:great_white_shark`
-- `[22:04:12] [main/ERROR]: No data fixer registered for naturalist:hedgehog`
+- `[22:13:39] [main/WARN]: Error loading class: traben/entity_model_features/models/animation/EMFAnimationEntityContext (java.lang.ClassNotFoundException: traben/entity_model_features/models/animation/EMFAnimationEntityCont`
+- `[22:13:39] [main/WARN]: Error loading class: com/electronwill/nightconfig/core/io/IoUtils (java.lang.ClassNotFoundException: com/electronwill/nightconfig/core/io/IoUtils)`
+- `[22:13:40] [main/WARN]: Error loading class: com/simibubi/create/content/schematics/SchematicPrinter (java.lang.ClassNotFoundException: com/simibubi/create/content/schematics/SchematicPrinter)`
+- `[22:13:40] [main/WARN]: Error loading class: net/minecraft/class_525 (java.lang.ClassNotFoundException: net/minecraft/class_525)`
+- `[22:13:40] [main/WARN]: Error loading class: net/caffeinemc/mods/sodium/client/render/chunk/compile/pipeline/DefaultFluidRenderer (java.lang.ClassNotFoundException: net/caffeinemc/mods/sodium/client/render/chunk/compile/`
+- `[22:13:40] [main/WARN]: Error loading class: com/simibubi/create/content/kinetics/base/BlockBreakingKineticBlockEntity (java.lang.ClassNotFoundException: com/simibubi/create/content/kinetics/base/BlockBreakingKineticBloc`
+- `[22:13:49] [main/ERROR]: No data fixer registered for spirit_wolf`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:alligator`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:ant`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:anglerfish`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:ray`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:blobfish`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:piranha`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:bass`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:bear`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:black_bear`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:bird`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:boar`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:butterfly`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:capybara`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:caterpillar`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:catfish`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:clam`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:crab`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:deer`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:dragonfly`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:duck`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:duck_egg`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:dirt_trail`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:carried_food`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:elephant`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:firefly`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:giant_isopod`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:giraffe`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:great_white_shark`
+- `[22:13:52] [main/ERROR]: No data fixer registered for naturalist:hedgehog`
 
 ## Warnings (19 total, top 15 únicos)
 
-- `[22:03:58] [main/WARN]: Warnings were found!`
-- `[22:03:58] [main/WARN]: Reference map 'balm.refmap.json' for balm.mixins.json could not be read. If this is a development environment you can ignore this message`
-- `[22:03:58] [main/WARN]: Reference map 'balm.refmap.json' for balm.fabric.mixins.json could not be read. If this is a development environment you can ignore this message`
-- `[22:03:58] [main/WARN]: Reference map 'forgeconfigapiport.common.refmap.json' for forgeconfigapiport.common.mixins.json could not be read. If this is a development environment you can ignore this message`
-- `[22:03:58] [main/WARN]: Reference map 'leavesbegone.fabric.refmap.json' for leavesbegone.fabric.mixins.json could not be read. If this is a development environment you can ignore this message`
-- `[22:03:58] [main/WARN]: Mod 'supplementaries' attempted to override option 'mixins.block.moving_block_shapes', which doesn't exist, ignoring`
-- `[22:03:59] [main/WARN]: Reference map 'tiny_config-common-common-refmap.json' for tiny_config.mixins.json could not be read. If this is a development environment you can ignore this message`
-- `[22:03:59] [main/WARN]: Reference map 'waystones.refmap.json' for waystones.mixins.json could not be read. If this is a development environment you can ignore this message`
-- `[22:03:59] [main/WARN]: Reference map 'waystones.refmap.json' for waystones.fabric.mixins.json could not be read. If this is a development environment you can ignore this message`
-- `[22:03:59] [main/WARN]: Error loading class: traben/entity_model_features/models/animation/EMFAnimationEntityContext (java.lang.ClassNotFoundException: traben/entity_model_features/models/animation/EMFAnimationEntityCont`
-- `[22:03:59] [main/WARN]: Error loading class: com/electronwill/nightconfig/core/io/IoUtils (java.lang.ClassNotFoundException: com/electronwill/nightconfig/core/io/IoUtils)`
-- `[22:03:59] [main/WARN]: Error loading class: com/simibubi/create/content/schematics/SchematicPrinter (java.lang.ClassNotFoundException: com/simibubi/create/content/schematics/SchematicPrinter)`
-- `[22:03:59] [main/WARN]: Error loading class: net/minecraft/class_525 (java.lang.ClassNotFoundException: net/minecraft/class_525)`
-- `[22:03:59] [main/WARN]: @Mixin target net.minecraft.class_525 was not found moonlight.mixins.json:CreateWorldScreenMixin from mod moonlight`
-- `[22:04:00] [main/WARN]: Error loading class: net/caffeinemc/mods/sodium/client/render/chunk/compile/pipeline/DefaultFluidRenderer (java.lang.ClassNotFoundException: net/caffeinemc/mods/sodium/client/render/chunk/compile/`
+- `[22:13:38] [main/WARN]: Warnings were found!`
+- `[22:13:39] [main/WARN]: Reference map 'balm.refmap.json' for balm.mixins.json could not be read. If this is a development environment you can ignore this message`
+- `[22:13:39] [main/WARN]: Reference map 'balm.refmap.json' for balm.fabric.mixins.json could not be read. If this is a development environment you can ignore this message`
+- `[22:13:39] [main/WARN]: Reference map 'forgeconfigapiport.common.refmap.json' for forgeconfigapiport.common.mixins.json could not be read. If this is a development environment you can ignore this message`
+- `[22:13:39] [main/WARN]: Reference map 'leavesbegone.fabric.refmap.json' for leavesbegone.fabric.mixins.json could not be read. If this is a development environment you can ignore this message`
+- `[22:13:39] [main/WARN]: Mod 'supplementaries' attempted to override option 'mixins.block.moving_block_shapes', which doesn't exist, ignoring`
+- `[22:13:39] [main/WARN]: Reference map 'tiny_config-common-common-refmap.json' for tiny_config.mixins.json could not be read. If this is a development environment you can ignore this message`
+- `[22:13:39] [main/WARN]: Reference map 'waystones.refmap.json' for waystones.mixins.json could not be read. If this is a development environment you can ignore this message`
+- `[22:13:39] [main/WARN]: Reference map 'waystones.refmap.json' for waystones.fabric.mixins.json could not be read. If this is a development environment you can ignore this message`
+- `[22:13:39] [main/WARN]: Error loading class: traben/entity_model_features/models/animation/EMFAnimationEntityContext (java.lang.ClassNotFoundException: traben/entity_model_features/models/animation/EMFAnimationEntityCont`
+- `[22:13:39] [main/WARN]: Error loading class: com/electronwill/nightconfig/core/io/IoUtils (java.lang.ClassNotFoundException: com/electronwill/nightconfig/core/io/IoUtils)`
+- `[22:13:40] [main/WARN]: Error loading class: com/simibubi/create/content/schematics/SchematicPrinter (java.lang.ClassNotFoundException: com/simibubi/create/content/schematics/SchematicPrinter)`
+- `[22:13:40] [main/WARN]: Error loading class: net/minecraft/class_525 (java.lang.ClassNotFoundException: net/minecraft/class_525)`
+- `[22:13:40] [main/WARN]: @Mixin target net.minecraft.class_525 was not found moonlight.mixins.json:CreateWorldScreenMixin from mod moonlight`
+- `[22:13:40] [main/WARN]: Error loading class: net/caffeinemc/mods/sodium/client/render/chunk/compile/pipeline/DefaultFluidRenderer (java.lang.ClassNotFoundException: net/caffeinemc/mods/sodium/client/render/chunk/compile/`
 
 ## Cola del log (últimas 30 líneas)
 
 ```
-[22:04:38] [Worker-Main-2/INFO]: Preparing spawn area: 18%
-[22:04:38] [Worker-Main-2/INFO]: Preparing spawn area: 18%
-[22:04:39] [Worker-Main-1/INFO]: Preparing spawn area: 51%
-[22:04:39] [Worker-Main-3/INFO]: Preparing spawn area: 51%
-[22:04:40] [Worker-Main-1/INFO]: Preparing spawn area: 51%
-[22:04:40] [Worker-Main-1/INFO]: Preparing spawn area: 51%
-[22:04:41] [Worker-Main-1/INFO]: Preparing spawn area: 51%
-[22:04:41] [Server thread/INFO]: Time elapsed: 9007 ms
-[22:04:41] [Server thread/INFO]: Done (18.387s)! For help, type "help"
-[22:04:41] [Server thread/INFO]: Added 2 Biomes
-[22:04:41] [Server thread/INFO]:  - minecraft:end_barrens, subbiomes=1
-[22:04:41] [Server thread/INFO]:  - minecraft:end_midlands, subbiomes=1
-[22:04:41] [Server thread/INFO]: Added 2 Biomes
-[22:04:41] [Server thread/INFO]:  - minecraft:end_barrens, subbiomes=1
-[22:04:41] [Server thread/INFO]:  - minecraft:end_midlands, subbiomes=1
-[22:04:41] [VoiceChatServerThread/INFO]: [voicechat] Voice chat server started at port 24454
-[22:05:00] [Server thread/INFO]: Stopping the server
-[22:05:01] [Server thread/INFO]: Stopping server
-[22:05:01] [Server thread/INFO]: Saving players
-[22:05:01] [Server thread/INFO]: Saving worlds
-[22:05:01] [Server thread/INFO]: saving Alternate Current config
-[22:05:01] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
-[22:05:01] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
-[22:05:01] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
-[22:05:01] [Server thread/INFO]: ThreadedAnvilChunkStorage (world): All chunks are saved
-[22:05:01] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
-[22:05:01] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
-[22:05:01] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved
-[22:05:01] [Server thread/INFO]: Successfully drained database queue
-[22:05:01] [Server thread/INFO]: Dispatching unloading event for config leavesbegone-server.toml
+[22:14:16] [Worker-Main-2/INFO]: Preparing spawn area: 18%
+[22:14:16] [Worker-Main-2/INFO]: Preparing spawn area: 18%
+[22:14:17] [Worker-Main-3/INFO]: Preparing spawn area: 18%
+[22:14:17] [Worker-Main-2/INFO]: Preparing spawn area: 51%
+[22:14:18] [Worker-Main-3/INFO]: Preparing spawn area: 51%
+[22:14:18] [Worker-Main-1/INFO]: Preparing spawn area: 51%
+[22:14:19] [Worker-Main-2/INFO]: Preparing spawn area: 51%
+[22:14:19] [Server thread/INFO]: Time elapsed: 6526 ms
+[22:14:19] [Server thread/INFO]: Done (16.506s)! For help, type "help"
+[22:14:19] [Server thread/INFO]: Added 2 Biomes
+[22:14:19] [Server thread/INFO]:  - minecraft:end_midlands, subbiomes=1
+[22:14:19] [Server thread/INFO]:  - minecraft:end_barrens, subbiomes=1
+[22:14:20] [Server thread/INFO]: Added 2 Biomes
+[22:14:20] [Server thread/INFO]:  - minecraft:end_midlands, subbiomes=1
+[22:14:20] [Server thread/INFO]:  - minecraft:end_barrens, subbiomes=1
+[22:14:20] [VoiceChatServerThread/INFO]: [voicechat] Voice chat server started at port 24454
+[22:14:39] [Server thread/INFO]: Stopping the server
+[22:14:39] [Server thread/INFO]: Stopping server
+[22:14:39] [Server thread/INFO]: Saving players
+[22:14:39] [Server thread/INFO]: Saving worlds
+[22:14:39] [Server thread/INFO]: saving Alternate Current config
+[22:14:39] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[22:14:40] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+[22:14:40] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[22:14:40] [Server thread/INFO]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[22:14:40] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[22:14:40] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[22:14:40] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved
+[22:14:40] [Server thread/INFO]: Successfully drained database queue
+[22:14:40] [Server thread/INFO]: Dispatching unloading event for config leavesbegone-server.toml
 ```
 
 ## Reproducir
