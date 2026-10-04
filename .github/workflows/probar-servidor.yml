@@ -65,7 +65,7 @@ jobs:
 
       - name: Arrancar y analizar
         id: arranque
-        run: python3 scripts/probar_servidor.py --dir prueba/servidor --resolucion modpack/resolucion.json --informe docs/INFORME_ARRANQUE.md --installer "$INSTALLER_VERSION"
+        run: python3 scripts/probar_servidor.py --dir prueba/servidor --resolucion modpack/resolucion.json --informe docs/INFORME_ARRANQUE.md --installer "$INSTALLER_VERSION" --mrpack build/*.mrpack
 
       - name: Publicar informe
         if: always()

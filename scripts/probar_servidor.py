@@ -17,6 +17,7 @@ import subprocess
 import sys
 import threading
 import time
+import zipfile
 from collections import deque
 from datetime import datetime, timezone
 from pathlib import Path
@@ -81,6 +82,7 @@ def main() -> int:
     ap.add_argument("--xms", default="1G")
     ap.add_argument("--xmx", default="4G")
     ap.add_argument("--installer", default="?")
+    ap.add_argument("--mrpack", default=None, help="mrpack para auditar jars (env por fichero).")
     ap.add_argument("--timeout-arranque", type=int, default=600)
     ap.add_argument("--asentamiento", type=int, default=15)
     ap.add_argument("--timeout-parada", type=int, default=120)
@@ -207,6 +209,21 @@ def main() -> int:
     norm_ids = {norm(k): k for k in modids}
 
     en_srv = sorted(s for s in cli_lock if norm(s) in norm_ids)
+    # Auditoría dura a nivel de .jar (vía env del índice mrpack): un modid puede
+    # aparecer embebido (JarInJar, p. ej. placeholder-api dentro de Polymer) sin
+    # que su jar esté instalado. Lo autoritativo es qué jars hay en servidor/.
+    jar_mal, jars_srv, auditoria_jars = [], [], "omitida (sin mrpack)"
+    if args.mrpack and Path(args.mrpack).exists():
+        with zipfile.ZipFile(args.mrpack) as z:
+            index = json.loads(z.read("modrinth.index.json"))
+        env_jar = {f["path"].rsplit("/", 1)[-1]: f.get("env", {}) for f in index.get("files", [])}
+        jars_srv = sorted(p.name for p in (srv / "mods").glob("*.jar"))
+        for fn in jars_srv:
+            if env_jar.get(fn, {}).get("server") != "required":
+                jar_mal.append(fn)
+        auditoria_jars = f"{len(jars_srv)} jars auditados"
+    elif (srv / "mods").is_dir():
+        jars_srv = sorted(p.name for p in (srv / "mods").glob("*.jar"))
     crash_dir = srv / "crash-reports"
     crashes = sorted(p.name for p in crash_dir.glob("*.txt")) if crash_dir.is_dir() else []
 
@@ -236,7 +253,7 @@ def main() -> int:
         if len(top_warn) >= 15:
             break
 
-    listo_ok = t_listo is not None and not en_srv and not crashes and parada_limpia
+    listo_ok = t_listo is not None and not jar_mal and not crashes and parada_limpia
     ahora = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     informe = [
         f"# Informe de arranque — servidor 1.0.0 ({res.get('minecraft')} + fabric)",
@@ -261,8 +278,12 @@ def main() -> int:
         f"- {'✔' if parada_limpia else '❌'} Parada limpia con `stop` (exit 0).",
         f"- {'✔' if not crashes else '❌'} Sin crash-reports"
         + (f": {', '.join(crashes)}" if crashes else "."),
-        f"- {'✔' if not en_srv else '❌'} Ningún mod de cliente cargado"
-        + (f": {', '.join(en_srv)}" if en_srv else f" (0 de {len(cli_lock)})."),
+        f"- {'✔' if not jar_mal else '❌'} Ningún .jar de cliente en servidor/"
+        f" ({auditoria_jars})"
+        + (f": {', '.join(jar_mal)}" if jar_mal else "."),
+        f"- {'✔' if not en_srv else '⚠'} Modids de cliente en loader: "
+        f"{', '.join(en_srv) if en_srv else 'ninguno'}"
+        + (" (embebido JiJ: su jar no está instalado)" if en_srv else ""),
         "",
         "## Spotlight",
         "",
@@ -274,6 +295,8 @@ def main() -> int:
     informe += ["", "## Mods cargados (Fabric Loader)", ""]
     for mid in sorted(modids, key=str.lower):
         informe.append(f"- `{mid}` {modids[mid]}")
+    informe += ["", f"## Jars en servidor/mods ({len(jars_srv)})", ""]
+    informe += [f"- `{j}`" for j in jars_srv] or ["- (vacío)"]
     informe += ["", f"## Líneas de error únicas ({len(errores_log)})", ""]
     informe += [f"- `{e}`" for e in errores_log[:40]] or ["- (ninguna)"]
     informe += ["", f"## Warnings ({len(warns)} total, top 15 únicos)", ""]
@@ -299,12 +322,14 @@ def main() -> int:
     print(f"::notice::ARRANQUE listo={'si' if t_listo else 'no'} "
           f"t_listo={f'{t_listo - t0:.0f}s' if t_listo else '-'} "
           f"pico={pico}MB mods={len(modids)} errores={len(errores_log)} "
-          f"warns={len(warns)} crash={len(crashes)} cliente_en_srv={len(en_srv)} "
+          f"warns={len(warns)} crash={len(crashes)} jar_cliente={len(jar_mal)} modid_aviso={len(en_srv)} "
           f"parada={'ok' if parada_limpia else 'no'}")
     if causa_fallo:
         print(f"::error::[arranque] {causa_fallo.strip()}")
+    for fn in jar_mal:
+        print(f"::error::[arranque] .jar de CLIENTE en servidor/: {fn}")
     for s in en_srv:
-        print(f"::error::[arranque] mod de CLIENTE cargado en servidor: {s}")
+        print(f"::warning::[arranque] modid de cliente (JiJ embebido): {s}")
     for c in crashes:
         print(f"::error::[arranque] crash-report: {c}")
     if t_listo is None:
