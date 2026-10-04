@@ -27,14 +27,14 @@ El repo contenía solo el esqueleto: `modpack/modpack.yml` con `mods: []`,
 `server/.gitkeep`, un workflow que copiaba `server/` a un artefacto y una copia
 anidada duplicada `server/modpack/` (eliminada por confusa). Sobre eso se ha montado:
 
-- Manifiesto único (`modpack/modpack.yml`) con 86 mods core + 11 opcionales (revisión 3.2, 3 jugadores).
+- Manifiesto único (`modpack/modpack.yml`) con 91 mods core + 11 opcionales (revisión 3.3, 3 jugadores).
 - `scripts/resolver.py`: verifica compatibilidad 1.21.1/Fabric, lado y dependencias
   contra Modrinth **sin descargar nada**.
 - `scripts/construir.py`: descarga y genera `.mrpack` + pack de servidor
   (**bloqueado hasta aprobación**).
 - CI que valida y verifica en cada cambio.
 
-## 1. Librerías / dependencias (24)
+## 1. Librerías / dependencias (29)
 
 No aportan contenido; las exigen otros mods. Todas ligeras.
 
@@ -51,6 +51,11 @@ No aportan contenido; las exigen otros mods. Todas ligeras.
 | Lithostitched | Worldgen de Terralith | servidor | 🟢 | confirmada |
 | YACL | Pantallas de config (Debugify) | cliente | 🟢 | confirmada |
 | Bundle API | Base de Runes | ambos | 🟢 | confirmada |
+| Fabric Language Kotlin | Kotlin para Ledger | servidor | 🟢 | confirmada |
+| Forge Config API Port | Configs Forge portadas (Puzzles) | servidor | 🟢 | confirmada |
+| Puzzles Lib | Base de Leaves Be Gone | servidor | 🟢 | confirmada |
+| Text Placeholder API | Placeholders (ModMenu) | cliente | 🟢 | confirmada |
+| Fzzy Config | Configs con GUI (EMI Loot) | ambos | 🟢 | confirmada |
 | BCLib | Base de Better Nether/End | ambos | 🟡 | confirmada |
 | RebornCore (`reborncore`, sin guion) | Base de Tech Reborn | ambos | 🟡 | confirmada |
 | Spell Engine | Sistema de hechizos (Wizards/Archers) | ambos | 🟡 | confirmada |
@@ -180,7 +185,7 @@ Polymer AutoHost: los 3 jugadores aceptan el resource pack del servidor al entra
 | Mod | Para qué sirve | Lado | Impacto | Verif. |
 | --- | --- | --- | --- | --- |
 | EMI | Visor de recetas (más ligero que REI) | cliente | 🟡 | estandar |
-| EMI Loot | Loot de cofres/mobs dentro de EMI | cliente | 🟢 | estandar |
+| EMI Loot | Loot de cofres/mobs dentro de EMI | ambos | 🟢 | confirmada |
 | WTHIT | Info del bloque al mirar (alt. Fabric de Jade) | cliente | 🟢 | estandar |
 | Shulker Box Tooltip | Ver dentro de shulkers sin abrirlas | cliente | 🟢 | estandar |
 | Mouse Tweaks | Arrastrar/mover objetos con el ratón | cliente | 🟢 | estandar |
@@ -214,7 +219,7 @@ Cada dependencia `required` se comprobó por ID de proyecto en la API de Modrint
 - Fabric API ← todo el pack.
 - Cloth Config ← Lootr, Spell Engine, Combat Roll.
 - Balm ← Waystones, Comforts. · Moonlight ← Supplementaries. · BCLib ← Better Nether/End.
-- `reborncore` (sin guion) ← Tech Reborn. · YUNG's API ← YUNG's ×4. · Cristel Lib ← Towns and Towers. · LibZ ← LevelZ. · WorldWeaver ← BCLib/BetterNether/BetterEnd. · Lithostitched ← Terralith. · YACL ← Debugify. · Bundle API ← Runes.
+- `reborncore` (sin guion) ← Tech Reborn. · YUNG's API ← YUNG's ×4. · Cristel Lib ← Towns and Towers. · LibZ ← LevelZ. · WorldWeaver ← BCLib/BetterNether/BetterEnd. · Lithostitched ← Terralith. · YACL ← Debugify. · Bundle API ← Runes. · Fabric Language Kotlin ← Ledger. · Puzzles Lib + Forge Config API Port ← Leaves Be Gone. · Placeholder API ← ModMenu. · Fzzy Config ← EMI Loot.
 - Wizards ← {Spell Engine, Runes, Armor Model API, Structure Pool API, Fabric API}.
 - Archers ← {Spell Engine, Ranged Weapon API, Armor Model API, Structure Pool API, Fabric API}.
 - Spell Engine ← {Spell Power, Trinkets, Cloth Config, playerAnimator, Fabric API}.
@@ -347,7 +352,7 @@ o no por su cuenta.
 
 ## 19. Decisiones que necesito de ti
 
-1. **Aprobar / recortar / cambiar** esta selección (86 core + 11 opcionales, rev 3.2).
+1. **Aprobar / recortar / cambiar** esta selección (91 core + 11 opcionales, rev 3.3).
 2. **Simple Voice Chat**: ✅ se queda; documentado requisito UDP 24454.
 3. **Expanded Storage**: ✅ eliminado por archivado; almacén via TR + vanilla.
 4. **Opcionales**: ✅ triage hecho — promocionan World Map, Sound Physics,
@@ -388,3 +393,8 @@ o no por su cuenta.
   Lados corregidos: Noisium → servidor, YUNG's API → ambos. EMI Trades sale
   del core (sin build 1.21.1; el slug no existe) y su fork Reborn pasa a
   opcionales. Resultado: 86 core + 11 opcionales, 0 pendientes en core.
+- **Rev 3.3**: segunda tanda de dependencias del CI. Nuevas: Fabric Language
+  Kotlin (← Ledger), Puzzles Lib + Forge Config API Port (← Leaves Be Gone),
+  Placeholder API (← ModMenu), Fzzy Config (← EMI Loot). Lado corregido:
+  EMI Loot → ambos (requiere servidor). Resultado: 91 core + 11 opcionales,
+  0 pendientes en core.

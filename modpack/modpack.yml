@@ -111,6 +111,46 @@ mods:
     verificacion: confirmada
     estado: propuesto
     notas: Requerida por Runes. Ambos lados.
+  - slug: fabric-language-kotlin
+    nombre: Fabric Language Kotlin
+    lado: servidor
+    categoria: libreria
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Kotlin para Fabric. Requerido por Ledger. Solo servidor.
+  - slug: forge-config-api-port
+    nombre: Forge Config API Port
+    lado: servidor
+    categoria: libreria
+    impacto: despreciable
+    verificacion: confirmada
+    estado: propuesto
+    notas: Sistema de configs Forge portado. Requerido por Puzzles Lib. Solo servidor.
+  - slug: puzzles-lib
+    nombre: Puzzles Lib
+    lado: servidor
+    categoria: libreria
+    impacto: despreciable
+    verificacion: confirmada
+    estado: propuesto
+    notas: Base de Leaves Be Gone. Solo servidor.
+  - slug: placeholder-api
+    nombre: Text Placeholder API
+    lado: cliente
+    categoria: libreria
+    impacto: despreciable
+    verificacion: confirmada
+    estado: propuesto
+    notas: Placeholders de texto. Requerido por ModMenu. Solo cliente.
+  - slug: fzzy-config
+    nombre: Fzzy Config
+    lado: ambos
+    categoria: libreria
+    impacto: despreciable
+    verificacion: confirmada
+    estado: propuesto
+    notas: Configs con GUI y sync. Requerida por EMI Loot. Ambos lados.
   - slug: bclib
     nombre: BCLib
     lado: ambos
@@ -614,10 +654,10 @@ mods:
     notas: Visor de recetas. Elegido frente a REI por ser más ligero y nativo de Fabric.
   - slug: emi-loot
     nombre: EMI Loot
-    lado: cliente
+    lado: ambos
     categoria: qol
     impacto: despreciable
-    verificacion: estandar
+    verificacion: confirmada
     estado: propuesto
     notas: Muestra loot de cofres/mobs en EMI.
   - slug: wthit
