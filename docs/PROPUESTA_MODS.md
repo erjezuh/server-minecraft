@@ -400,3 +400,9 @@ o no por su cuenta.
   Placeholder API (← ModMenu), Fzzy Config (← EMI Loot). Lado corregido:
   EMI Loot → ambos (requiere servidor). Resultado: 91 core + 11 opcionales,
   0 pendientes en core.
+- **Build 1.0.0**: aprobación explícita del usuario. Estado → `aprobado`;
+  §16 corregido (cliente ≈190–210 MB, servidor ≈200–220 MB). 91 versiones
+  fijadas en `modpack/resolucion.json` (fabric-loader 0.19.5, 2026-10-04).
+  Paquetes verificados: `Karmaland-1.0.0.mrpack` (198,8 MB, 70 jars) +
+  `servidor.zip` (225,9 MB, 68 jars, 0 mods de cliente). 11 opcionales fuera.
+  Sin despliegue.
