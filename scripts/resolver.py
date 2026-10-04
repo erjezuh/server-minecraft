@@ -255,6 +255,11 @@ def main():
 
     fallos = [r for r in resultados if r["nucleo"] and r["error"]]
     avisos_core = [r for r in resultados if r["nucleo"] and not r["error"] and r["avisos"]]
+    for r in fallos:
+        print(f"::error file=modpack/modpack.yml::[{r['slug']}] {r['error']}")
+    for r in avisos_core:
+        for a in r["avisos"]:
+            print(f"::error file=modpack/modpack.yml::[{r['slug']}] {a}")
     for r in resultados:
         tag = "NUCLEO" if r["nucleo"] else "OPC   "
         if r["error"]:
@@ -294,4 +299,12 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except SystemExit:
+        raise
+    except Exception:
+        import traceback
+        tb = traceback.format_exc().replace("\n", " | ")
+        print(f"::error file=scripts/resolver.py::CRASH {tb[:1500]}")
+        sys.exit(2)
