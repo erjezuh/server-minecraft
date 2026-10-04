@@ -147,7 +147,7 @@ def verificar(mods: list, mc: str, loader: str, declarados: set, nucleo: bool):
         slug = mod["slug"]
         fila = {"slug": slug, "nombre": mod.get("nombre", slug), "lado": mod["lado"],
                 "nucleo": nucleo, "ok": True, "avisos": [], "error": None,
-                "version": None, "dependencias": []}
+                "version": None, "dependencias": [], "lado_manual": False}
         try:
             proyecto, version = mejor_version(slug, mc, loader)
         except Exception as e:  # red caída, etc.
@@ -169,12 +169,17 @@ def verificar(mods: list, mc: str, loader: str, declarados: set, nucleo: bool):
             "id": version["id"],
             "numero": version.get("version_number", "?"),
             "tipo": version.get("version_type", "?"),
-            "entorno": {"client": version.get("client", "unknown"),
-                        "server": version.get("server", "unknown")},
+            # El lado "oficial" vive en el proyecto, no en la version.
+            "entorno": {"client": (proyecto or {}).get("client_side", "unknown"),
+                        "server": (proyecto or {}).get("server_side", "unknown"),
+                        "detalle": version.get("environment", "?")},
         }
-        aviso = comprobar_lado(mod["lado"], fila["version"]["entorno"])
-        if aviso:
-            fila["avisos"].append(aviso)
+        if mod.get("lado_verificado_manual"):
+            fila["lado_manual"] = True
+        else:
+            aviso = comprobar_lado(mod["lado"], fila["version"]["entorno"])
+            if aviso:
+                fila["avisos"].append(aviso)
         for dep in version.get("dependencies", []) or []:
             tipo = dep.get("dependency_type", "unknown")
             dep_slug = slug_desde_id(dep["project_id"]) if dep.get("project_id") else "?"
@@ -209,7 +214,12 @@ def escribir_informe(path: Path, m: dict, resultados: list):
         else:
             ver = f"{r['version']['numero']} ({r['version']['tipo']})"
             env = f"{r['version']['entorno']['client']}/{r['version']['entorno']['server']}"
-            estado = "✅ OK" if not r["avisos"] else "⚠️ " + "; ".join(r["avisos"])
+            if r["avisos"]:
+                estado = "⚠️ " + "; ".join(r["avisos"])
+            elif r.get("lado_manual"):
+                estado = "✅ OK (lado verificado manual)"
+            else:
+                estado = "✅ OK"
         lineas.append(f"| {r['nombre']} `{r['slug']}` | {r['lado']} | {ver} | {env} | {estado} |")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lineas) + "\n", encoding="utf-8")
@@ -252,7 +262,8 @@ def main():
         elif r["avisos"]:
             print(f"  [{tag}] ⚠️  {r['slug']}: " + " | ".join(r["avisos"]))
         else:
-            print(f"  [{tag}] ✅ {r['slug']} {r['version']['numero']}")
+            extra = " (lado verificado manual)" if r.get("lado_manual") else ""
+            print(f"  [{tag}] ✅ {r['slug']} {r['version']['numero']}{extra}")
 
     if args.informe:
         escribir_informe(Path(args.informe), m, resultados)

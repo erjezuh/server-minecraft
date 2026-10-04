@@ -12,6 +12,8 @@
 #   - confirmada: verificado en Modrinth durante la propuesta (ver docs/PROPUESTA_MODS.md).
 #   - estandar:   mod ubicuo en packs 1.21.1/Fabric; lo re-verifica resolver.py.
 #   - pendiente:  resolver.py debe confirmar slug/existencia antes de incluir.
+# lado_verificado_manual: true (opcional) — justifica un lado que difiere del
+#   entorno Modrinth (p. ej. librería server-only exigida por mods de ambos).
 # =====================================================================
 minecraft: "1.21.1"
 loader: "fabric"
@@ -61,6 +63,14 @@ mods:
     verificacion: estandar
     estado: propuesto
     notas: Requerida por los mods de estructuras de YUNG (solo servidor).
+  - slug: cristel-lib
+    nombre: Cristel Lib
+    lado: servidor
+    categoria: libreria
+    impacto: despreciable
+    verificacion: confirmada
+    estado: propuesto
+    notas: Requerida por Towns and Towers (configs de estructuras). Solo servidor.
   - slug: bclib
     nombre: BCLib
     lado: ambos
@@ -76,7 +86,7 @@ mods:
     impacto: bajo
     verificacion: confirmada
     estado: propuesto
-    notas: Requerida por Tech Reborn. OJO: el slug correcto es 'reborncore' (sin guion).
+    notas: "Requerida por Tech Reborn. OJO: el slug correcto es 'reborncore' (sin guion)."
   - slug: spell-engine
     nombre: Spell Engine
     lado: ambos
@@ -108,15 +118,16 @@ mods:
     impacto: bajo
     verificacion: confirmada
     estado: propuesto
-    notas: Requerida por Wizards y Archers 3.x (túnicas). Va por el pipeline vanilla: compatible con Sodium.
+    notas: "Requerida por Wizards y Archers 3.x (túnicas). Va por el pipeline vanilla: compatible con Sodium."
   - slug: structure-pool-api
     nombre: Structure Pool API
     lado: ambos
+    lado_verificado_manual: true
     categoria: libreria
     impacto: despreciable
     verificacion: confirmada
     estado: propuesto
-    notas: Dependencia de Wizards/Archers (torres). ID verificado en Modrinth.
+    notas: "Dependencia de Wizards/Archers (torres). Modrinth la marca server-only, pero Wizards/Archers (ambos) la exigen: debe ir en ambos lados."
   - slug: ranged-weapon-api
     nombre: Ranged Weapon API
     lado: ambos
@@ -330,7 +341,7 @@ mods:
     impacto: bajo
     verificacion: confirmada
     estado: propuesto
-    notas: Aldeas y puestos por bioma. Modrinth: servidor requerido, cliente opcional -> solo servidor.
+    notas: "Aldeas y puestos por bioma. Modrinth: servidor requerido, cliente opcional -> solo servidor."
   - slug: betterend
     nombre: Better End
     lado: ambos
@@ -338,7 +349,7 @@ mods:
     impacto: moderado
     verificacion: confirmada
     estado: propuesto
-    notas: Reforma completa del End: biomas, mobs, rituales. Requiere BCLib.
+    notas: "Reforma completa del End: biomas, mobs, rituales. Requiere BCLib."
   - slug: betternether
     nombre: Better Nether
     lado: ambos
@@ -346,7 +357,7 @@ mods:
     impacto: moderado
     verificacion: confirmada
     estado: propuesto
-    notas: Reforma completa del Nether: biomas, mobs, materiales. Requiere BCLib.
+    notas: "Reforma completa del Nether: biomas, mobs, materiales. Requiere BCLib."
   - slug: waystones
     nombre: Waystones
     lado: ambos
@@ -362,7 +373,7 @@ mods:
     impacto: despreciable
     verificacion: confirmada
     estado: propuesto
-    notas: Localiza biomas (imprescindible con 100+ biomas de Terralith). OJO: el slug correcto es 'natures-compass'.
+    notas: "Localiza biomas (imprescindible con 100+ biomas de Terralith). OJO: el slug correcto es 'natures-compass'."
   - slug: xaeros-minimap
     nombre: Xaero's Minimap
     lado: cliente
@@ -406,7 +417,7 @@ mods:
     impacto: moderado
     verificacion: confirmada
     estado: propuesto
-    notas: Magia completa: varitas, hechizos, túnicas y torres de mago con loot.
+    notas: "Magia completa: varitas, hechizos, túnicas y torres de mago con loot."
   - slug: archers
     nombre: Archers (RPG Series)
     lado: ambos
@@ -518,7 +529,7 @@ mods:
     impacto: bajo
     verificacion: confirmada
     estado: propuesto
-    notas: Chat de voz por proximidad. REQUISITO: puerto UDP abierto en el servidor (24454 por defecto).
+    notas: "Chat de voz por proximidad. REQUISITO: puerto UDP abierto en el servidor (24454 por defecto)."
   - slug: emotecraft
     nombre: Emotecraft
     lado: ambos
@@ -715,7 +726,7 @@ opcionales:
     impacto: bajo
     verificacion: estandar
     estado: propuesto
-    notas: Planos y esquemas para construir. Requiere Malilib. Rev3: fuera (nicho de constructores; cada jugador puede añadirlo, es solo cliente).
+    notas: "Planos y esquemas para construir. Requiere Malilib. Rev3: fuera (nicho de constructores; cada jugador puede añadirlo, es solo cliente)."
   - slug: malilib
     nombre: Malilib
     lado: cliente
@@ -731,7 +742,7 @@ opcionales:
     impacto: despreciable
     verificacion: estandar
     estado: propuesto
-    notas: Animaciones en primera persona (comer, mapas...). Rev3: fuera (solo afecta a tu propia vista; cada jugador puede añadirlo).
+    notas: "Animaciones en primera persona (comer, mapas...). Rev3: fuera (solo afecta a tu propia vista; cada jugador puede añadirlo)."
   - slug: tectonic
     nombre: Tectonic (datapack)
     lado: servidor
@@ -739,7 +750,7 @@ opcionales:
     impacto: moderado
     verificacion: estandar
     estado: propuesto
-    notas: Terreno aún más épico junto a Terralith. OJO: sube coste de generación (riesgo para 4 GB). Rev3: fuera; Terralith ya da 100+ biomas.
+    notas: "Terreno aún más épico junto a Terralith. OJO: sube coste de generación (riesgo para 4 GB). Rev3: fuera; Terralith ya da 100+ biomas."
   - slug: chipped
     nombre: Chipped
     lado: ambos
@@ -747,7 +758,7 @@ opcionales:
     impacto: moderado
     verificacion: estandar
     estado: propuesto
-    notas: Miles de variantes (jar de 14,3 MB). Rev3: fuera del core; Macaw's cubre deco con ~4 MB. Requiere Architectury.
+    notas: "Miles de variantes (jar de 14,3 MB). Rev3: fuera del core; Macaw's cubre deco con ~4 MB. Requiere Architectury."
   - slug: architectury-api
     nombre: Architectury API
     lado: ambos
@@ -792,17 +803,17 @@ descartados:
   - nombre: Industrial Revolution
     motivo: Sin soporte 1.21.1 confirmado; Tech Reborn sí lo tiene y cubre el hueco tecnológico.
   - nombre: Mekanism / Refined Storage / AE2 / Powah / Pipez
-    motivo: Exclusivos de Forge/NeoForge. Sin equivalente directo: se cubre con Tech Reborn + Expanded Storage.
+    motivo: "Exclusivos de Forge/NeoForge. Sin equivalente directo: se cubre con Tech Reborn + Expanded Storage."
   - nombre: Iron's Spells 'n Spellbooks
-    motivo: Exclusivo de Forge/NeoForge. Alternativa Fabric: Wizards (RPG Series).
+    motivo: "Exclusivo de Forge/NeoForge. Alternativa Fabric: Wizards (RPG Series)."
   - nombre: Ars Nouveau
-    motivo: Exclusivo de Forge/NeoForge. Alternativa Fabric: Wizards (RPG Series).
+    motivo: "Exclusivo de Forge/NeoForge. Alternativa Fabric: Wizards (RPG Series)."
   - nombre: Botania
     motivo: Pesado para el presupuesto de RAM y su soporte Fabric es dudoso; solapa con Wizards.
   - nombre: Biomes O' Plenty / Oh The Biomes We've Gone
     motivo: Sin Fabric 1.21.1 fiable (BYG es NeoForge). Terralith cubre mejor el hueco.
   - nombre: Epic Fight
-    motivo: Exclusivo de Forge/NeoForge. Alternativa Fabric: Better Combat + Combat Roll.
+    motivo: "Exclusivo de Forge/NeoForge. Alternativa Fabric: Better Combat + Combat Roll."
   - nombre: Jade
     motivo: En 1.21.1 el visor/info es de Forge/NeoForge; en Fabric se usa WTHIT.
   - nombre: REI (Roughly Enough Items)
@@ -838,7 +849,7 @@ descartados:
   - nombre: Enchanting Infuser
     motivo: Pide 2 librerías extra no listadas (Puzzles Lib + Forge Config API Port) para un lujo menor; basta el encantamiento vanilla.
   - nombre: GeckoLib
-    motivo: Verificado en Modrinth: ningún mod del pack la requiere (el stack RPG usa Armor Model API; Naturalist 2.x la eliminó).
+    motivo: "Verificado en Modrinth: ningún mod del pack la requiere (el stack RPG usa Armor Model API; Naturalist 2.x la eliminó)."
   - nombre: AzureLib Armor
     motivo: El stack RPG 3.x usa Armor Model API; nada referencia a AzureLib Armor en sus dependencias.
   - nombre: Reap (slug 'reap')
@@ -848,7 +859,7 @@ descartados:
   - nombre: DeathLog
     motivo: El slug 'deathlog' no tiene build 1.21.1 y la alternativa es diminuta; las tumbas las cubre Universal Graves.
   - nombre: Expanded Storage
-    motivo: Proyecto archivado/abandonado por su autor; decisión del usuario no depender de él. Almacén: Tech Reborn (Quantum) + vanilla.
+    motivo: "Proyecto archivado/abandonado por su autor; decisión del usuario no depender de él. Almacén: Tech Reborn (Quantum) + vanilla."
   - nombre: Corpse
     motivo: Sin versión Fabric (loaders forge+neoforge). Sustituido por Universal Graves + Polymer (100% servidor, coste 0 en cliente).
   - nombre: Villager Names
