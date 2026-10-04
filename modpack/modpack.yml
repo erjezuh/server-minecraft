@@ -157,6 +157,14 @@ mods:
     verificacion: confirmada
     estado: propuesto
     notas: Requerida por WTHIT (mensajería de red). Se instala junto a WTHIT en cliente.
+  - slug: polymer
+    nombre: Polymer
+    lado: servidor
+    categoria: libreria
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Requerida por Universal Graves (contenido server-side). Incluye AutoHost para el resource pack; en cliente es opcional (solo QoL visual).
 
   # ---------------- Optimización de servidor y lógica ----------------
   - slug: lithium
@@ -347,14 +355,14 @@ mods:
     verificacion: confirmada
     estado: propuesto
     notas: Teletransporte entre piedras. Esencial en multijugador. Requiere Balm.
-  - slug: nature-s-compass
+  - slug: natures-compass
     nombre: Nature's Compass
     lado: ambos
     categoria: exploracion
     impacto: despreciable
-    verificacion: estandar
+    verificacion: confirmada
     estado: propuesto
-    notas: Localiza biomas (imprescindible con 100+ biomas de Terralith).
+    notas: Localiza biomas (imprescindible con 100+ biomas de Terralith). OJO: el slug correcto es 'natures-compass'.
   - slug: xaeros-minimap
     nombre: Xaero's Minimap
     lado: cliente
@@ -363,6 +371,14 @@ mods:
     verificacion: estandar
     estado: propuesto
     notas: Minimapa ligero con waypoints. Más ligero que JourneyMap.
+  - slug: xaeros-world-map
+    nombre: Xaero's World Map
+    lado: cliente
+    categoria: exploracion
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Mapa de pantalla completa (imprescindible con Terralith). Requiere Fabric API; Minimapa como dependencia opcional (ya incluido).
 
   # ---------------- Mobs y mundo vivo ----------------
   - slug: naturalist
@@ -381,22 +397,6 @@ mods:
     verificacion: confirmada
     estado: propuesto
     notas: Mobs de las votaciones (golem de cobre, glare...) + mini-jefe Wildfire.
-  - slug: corpse
-    nombre: Corpse
-    lado: ambos
-    categoria: multijugador
-    impacto: despreciable
-    verificacion: estandar
-    estado: propuesto
-    notas: Al morir dejas un cadáver con tus objetos. Clave en multijugador.
-  - slug: villager-names
-    nombre: Villager Names
-    lado: servidor
-    categoria: mobs
-    impacto: despreciable
-    verificacion: estandar
-    estado: propuesto
-    notas: Los aldeanos tienen nombre. Pequeño, divertido, da vida al mundo.
 
   # ---------------- Magia, RPG y combate ----------------
   - slug: wizards
@@ -440,7 +440,7 @@ mods:
     estado: propuesto
     notas: Habilidades por niveles (minería, combate...). Progresión a largo plazo.
 
-  # ---------------- Tecnología y almacenamiento ----------------
+  # ---------------- Tecnología ----------------
   - slug: techreborn
     nombre: Tech Reborn
     lado: ambos
@@ -449,14 +449,6 @@ mods:
     verificacion: confirmada
     estado: propuesto
     notas: El mod tecnológico de Fabric para 1.21.1 (MI y Create no tienen Fabric aquí).
-  - slug: expanded-storage
-    nombre: Expanded Storage
-    lado: ambos
-    categoria: almacenamiento
-    impacto: bajo
-    verificacion: confirmada
-    estado: propuesto
-    notas: Cofres/barriles por niveles, vanilla+. AVISO: proyecto archivado (v1.21.1 estable).
 
   # ---------------- Construcción y decoración ----------------
   - slug: supplementaries
@@ -475,6 +467,30 @@ mods:
     verificacion: confirmada
     estado: propuesto
     notas: Muebles estilo vanilla (sillas, mesas, estanterías). Ligero, sin librerías extra.
+  - slug: macaws-doors
+    nombre: Macaw's Doors
+    lado: ambos
+    categoria: construccion
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Puertas de todos los estilos (build 1.21.1/Fabric verificada). Solo pide Fabric API; sin solape con Supplementaries/Another Furniture.
+  - slug: macaws-windows
+    nombre: Macaw's Windows
+    lado: ambos
+    categoria: construccion
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Ventanas, cristales, persianas y cortinas (2.4.2 verificada). Solo pide Fabric API.
+  - slug: macaws-roofs
+    nombre: Macaw's Roofs
+    lado: ambos
+    categoria: construccion
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Tejados, canalones y toldos (2.3.2 verificada, con fixes multijugador). Solo pide Fabric API.
 
   # ---------------- Comida y agricultura ----------------
   - slug: farmers-delight-refabricated
@@ -502,7 +518,7 @@ mods:
     impacto: bajo
     verificacion: confirmada
     estado: propuesto
-    notas: Chat de voz por proximidad. Necesita puerto UDP abierto en el servidor.
+    notas: Chat de voz por proximidad. REQUISITO: puerto UDP abierto en el servidor (24454 por defecto).
   - slug: emotecraft
     nombre: Emotecraft
     lado: ambos
@@ -527,6 +543,14 @@ mods:
     verificacion: confirmada
     estado: propuesto
     notas: Loot instanciado por jugador en cofres. Adiós a pelearse por mazmorras.
+  - slug: universal-graves
+    nombre: Universal Graves
+    lado: servidor
+    categoria: multijugador
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Tumbas server-side con tus objetos y XP (funcionan hasta con clientes vanilla). Requiere Polymer; los jugadores aceptan el pack del servidor al entrar.
 
   # ---------------- Calidad de vida en cliente ----------------
   - slug: emi
@@ -594,6 +618,32 @@ mods:
     estado: propuesto
     notas: Avatares en el chat. Pequeño y con encanto para jugar en grupo.
 
+  # ---------------- Inmersión (cliente) ----------------
+  - slug: sound-physics-remastered
+    nombre: Sound Physics Remastered
+    lado: cliente
+    categoria: inmersion
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Reverberación y oclusión realistas; integra el chat de voz (oír tras muros). Sin deps requeridas. Última build 1.21.1 marcada alpha (6M descargas, maduro).
+  - slug: presence-footsteps
+    nombre: Presence Footsteps
+    lado: cliente
+    categoria: inmersion
+    impacto: bajo
+    verificacion: confirmada
+    estado: propuesto
+    notas: Pasos según superficie (se oyen los de otros jugadores). 5,7 MB de sonidos, sin dependencias.
+  - slug: eating-animation
+    nombre: Eating Animation
+    lado: cliente
+    categoria: inmersion
+    impacto: despreciable
+    verificacion: confirmada
+    estado: propuesto
+    notas: Anima la comida/bebida al comer (visible para los demás). Cliente puro, sin dependencias.
+
   # ---------------- Calidad de vida en supervivencia ----------------
   - slug: fallingtree
     nombre: FallingTree
@@ -658,14 +708,6 @@ opcionales:
     verificacion: estandar
     estado: propuesto
     notas: Soporte de shaders. Solo para quien tenga GPU de sobra (3 GB justos).
-  - slug: xaeros-world-map
-    nombre: Xaero's World Map
-    lado: cliente
-    categoria: exploracion
-    impacto: bajo
-    verificacion: estandar
-    estado: propuesto
-    notas: Mapa completo del mundo. Consume más RAM/dis co que el minimapa solo.
   - slug: litematica
     nombre: Litematica
     lado: cliente
@@ -673,7 +715,7 @@ opcionales:
     impacto: bajo
     verificacion: estandar
     estado: propuesto
-    notas: Planos y esquemas para construir. Requiere Malilib.
+    notas: Planos y esquemas para construir. Requiere Malilib. Rev3: fuera (nicho de constructores; cada jugador puede añadirlo, es solo cliente).
   - slug: malilib
     nombre: Malilib
     lado: cliente
@@ -682,22 +724,6 @@ opcionales:
     verificacion: estandar
     estado: propuesto
     notas: Librería de Litematica.
-  - slug: sound-physics-remastered
-    nombre: Sound Physics Remastered
-    lado: cliente
-    categoria: inmersion
-    impacto: bajo
-    verificacion: estandar
-    estado: propuesto
-    notas: Reverberación realista. Combina con Simple Voice Chat.
-  - slug: presence-footsteps
-    nombre: Presence Footsteps
-    lado: cliente
-    categoria: inmersion
-    impacto: despreciable
-    verificacion: estandar
-    estado: propuesto
-    notas: Sonidos de pasos según superficie. Atmósfera por 0 RAM.
   - slug: not-enough-animations
     nombre: Not Enough Animations
     lado: cliente
@@ -705,15 +731,7 @@ opcionales:
     impacto: despreciable
     verificacion: estandar
     estado: propuesto
-    notas: Animaciones en primera persona (comer, mapas...). Mundo más vivo.
-  - slug: eating-animation
-    nombre: Eating Animation
-    lado: cliente
-    categoria: inmersion
-    impacto: despreciable
-    verificacion: estandar
-    estado: propuesto
-    notas: Anima el sprite al comer/beber. Cliente puro hasta 1.21.1; lo confirma el resolver.
+    notas: Animaciones en primera persona (comer, mapas...). Rev3: fuera (solo afecta a tu propia vista; cada jugador puede añadirlo).
   - slug: tectonic
     nombre: Tectonic (datapack)
     lado: servidor
@@ -721,7 +739,7 @@ opcionales:
     impacto: moderado
     verificacion: estandar
     estado: propuesto
-    notas: Terreno aún más épico junto a Terralith. OJO: sube coste de generación.
+    notas: Terreno aún más épico junto a Terralith. OJO: sube coste de generación (riesgo para 4 GB). Rev3: fuera; Terralith ya da 100+ biomas.
   - slug: chipped
     nombre: Chipped
     lado: ambos
@@ -729,7 +747,7 @@ opcionales:
     impacto: moderado
     verificacion: estandar
     estado: propuesto
-    notas: Miles de variantes (jar de 14,3 MB). Pesa en cliente; requiere Architectury. Solo si sobra RAM.
+    notas: Miles de variantes (jar de 14,3 MB). Rev3: fuera del core; Macaw's cubre deco con ~4 MB. Requiere Architectury.
   - slug: architectury-api
     nombre: Architectury API
     lado: ambos
@@ -738,30 +756,6 @@ opcionales:
     verificacion: estandar
     estado: propuesto
     notas: Solo necesaria si se activa Chipped. El core NO la necesita.
-  - slug: macaws-doors
-    nombre: Macaw's Doors
-    lado: ambos
-    categoria: construccion
-    impacto: bajo
-    verificacion: estandar
-    estado: propuesto
-    notas: Puertas extra (build 1.21.1/Fabric verificada). Alternativa/complemento deco.
-  - slug: macaws-windows
-    nombre: Macaw's Windows
-    lado: ambos
-    categoria: construccion
-    impacto: bajo
-    verificacion: pendiente
-    estado: propuesto
-    notas: Ventanas extra. Alternativa/complemento deco si se quiere más variedad.
-  - slug: macaws-roofs
-    nombre: Macaw's Roofs
-    lado: ambos
-    categoria: construccion
-    impacto: bajo
-    verificacion: pendiente
-    estado: propuesto
-    notas: Tejados extra. Alternativa/complemento deco si se quiere más variedad.
   - slug: luckperms
     nombre: LuckPerms
     lado: servidor
@@ -852,4 +846,12 @@ descartados:
   - nombre: Badges Lib (slug 'badges-lib')
     motivo: El slug no existe (404); WTHIT requiere Bad Packets ('badpackets'). Slug corregido.
   - nombre: DeathLog
-    motivo: El slug 'deathlog' no tiene build 1.21.1 y la alternativa es diminuta; Corpse ya cubre la muerte.
+    motivo: El slug 'deathlog' no tiene build 1.21.1 y la alternativa es diminuta; las tumbas las cubre Universal Graves.
+  - nombre: Expanded Storage
+    motivo: Proyecto archivado/abandonado por su autor; decisión del usuario no depender de él. Almacén: Tech Reborn (Quantum) + vanilla.
+  - nombre: Corpse
+    motivo: Sin versión Fabric (loaders forge+neoforge). Sustituido por Universal Graves + Polymer (100% servidor, coste 0 en cliente).
+  - nombre: Villager Names
+    motivo: Sin build 1.21.1 (llega solo a 1.21, abandonado en 2024). Capricho menor; no compensa estirar versiones.
+  - nombre: Nature's Compass (slug 'nature-s-compass')
+    motivo: Slug inexistente (404); el correcto es 'natures-compass'. Slug corregido.

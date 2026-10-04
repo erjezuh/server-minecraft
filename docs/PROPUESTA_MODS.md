@@ -27,14 +27,14 @@ El repo contenía solo el esqueleto: `modpack/modpack.yml` con `mods: []`,
 `server/.gitkeep`, un workflow que copiaba `server/` a un artefacto y una copia
 anidada duplicada `server/modpack/` (eliminada por confusa). Sobre eso se ha montado:
 
-- Manifiesto único (`modpack/modpack.yml`) con 75 mods core + 17 opcionales (revisión 2).
+- Manifiesto único (`modpack/modpack.yml`) con 81 mods core + 10 opcionales (revisión 3, 3 jugadores).
 - `scripts/resolver.py`: verifica compatibilidad 1.21.1/Fabric, lado y dependencias
   contra Modrinth **sin descargar nada**.
 - `scripts/construir.py`: descarga y genera `.mrpack` + pack de servidor
   (**bloqueado hasta aprobación**).
 - CI que valida y verifica en cada cambio.
 
-## 1. Librerías / dependencias (17)
+## 1. Librerías / dependencias (18)
 
 No aportan contenido; las exigen otros mods. Todas ligeras.
 
@@ -57,6 +57,7 @@ No aportan contenido; las exigen otros mods. Todas ligeras.
 | Resourceful Lib | Base de Friends and Foes | ambos | 🟡 | confirmada |
 | playerAnimator | Animaciones (Spell Engine, Better Combat, Combat Roll) | ambos | 🟢 | confirmada |
 | Bad Packets | Red de WTHIT | cliente | 🟢 | confirmada |
+| Polymer | Contenido server-side (Universal Graves) | servidor | 🟡 | confirmada |
 
 ## 2. Optimización servidor y lógica (5)
 
@@ -83,7 +84,7 @@ Combinación estándar tipo “Fabulously Optimized”. Sin esto, 3 GB no lucen.
 | Dynamic FPS | Baja FPS en 2.º plano/minimizado | cliente | 🛡️ | estandar |
 | Debugify | Corrige bugs vanilla que dan tirones | cliente | 🟢 | estandar |
 
-## 4. Mundo, exploración y estructuras (12)
+## 4. Mundo, exploración y estructuras (13)
 
 | Mod | Para qué sirve | Lado | Impacto | Verif. |
 | --- | --- | --- | --- | --- |
@@ -99,17 +100,16 @@ Combinación estándar tipo “Fabulously Optimized”. Sin esto, 3 GB no lucen.
 | Waystones | Teletransporte entre piedras; esencial en grupo | ambos | 🟡 | confirmada |
 | Nature's Compass | Localiza biomas (vital con Terralith) | ambos | 🟢 | estandar |
 | Xaero's Minimap | Minimapa ligero + waypoints | cliente | 🟡 | estandar |
+| Xaero's World Map | Mapa de pantalla completa | cliente | 🟡 | confirmada |
 
 \* Solo consumen en el **servidor** durante la generación; en cliente cuestan ~0.
 
-## 5. Mobs y mundo vivo (4)
+## 5. Mobs y mundo vivo (2)
 
 | Mod | Para qué sirve | Lado | Impacto | Verif. |
 | --- | --- | --- | --- | --- |
 | Naturalist | 47 animales con comportamientos y drops | ambos | 🟠 | confirmada |
 | Friends and Foes | Mobs de las votaciones + mini-jefe Wildfire | ambos | 🟡 | confirmada |
-| Corpse | Cadáver con tus objetos al morir | ambos | 🟢 | estandar |
-| Villager Names | Aldeanos con nombre; da vida al mundo | servidor | 🟢 | estandar |
 
 ## 6. Magia, RPG y combate (5)
 
@@ -123,26 +123,29 @@ Combinación estándar tipo “Fabulously Optimized”. Sin esto, 3 GB no lucen.
 
 Archers comparte casi todas las librerías con Wizards (solo añade Ranged Weapon API): su coste marginal es pequeño.
 
-## 7. Tecnología y almacenamiento (2)
+## 7. Tecnología (1)
 
 | Mod | Para qué sirve | Lado | Impacto | Verif. |
 | --- | --- | --- | --- | --- |
 | Tech Reborn | El mod tech de Fabric en 1.21.1: máquinas, energía, herramientas | ambos | 🟠 | confirmada |
-| Expanded Storage | Cofres/barriles por niveles, estilo vanilla | ambos | 🟡 | confirmada |
 
-⚠️ Expanded Storage está **archivado por su autor** (sin más updates), pero su build
-1.21.1 es estable. Al fijar versión exacta el riesgo es bajo; alternativa si se
-quiere cero riesgo: solo Tech Reborn + shulkers vanilla.
+Almacén (sin mod dedicado tras salir Expanded Storage): Tech Reborn aporta
+Quantum Chest/Tank para el late game; early game con cofres vanilla + shulkers
+(con Shulker Box Tooltip). Suficiente para 3 jugadores.
 
-## 8. Construcción y decoración (2)
+## 8. Construcción y decoración (5)
 
 | Mod | Para qué sirve | Lado | Impacto | Verif. |
 | --- | --- | --- | --- | --- |
 | Supplementaries | Deco + cacharros vanilla+ (jarras, veletas, relojes, globos...) | ambos | 🟡 | confirmada |
 | Another Furniture | Muebles vanilla (sillas, mesas, estanterías), sin deps extra | ambos | 🟡 | confirmada |
+| Macaw's Doors | Puertas de todos los estilos | ambos | 🟡 | confirmada |
+| Macaw's Windows | Ventanas, cristales, persianas, cortinas | ambos | 🟡 | confirmada |
+| Macaw's Roofs | Tejados, canalones y toldos | ambos | 🟡 | confirmada |
 
-Se eligieron **dos** mods complementarios (cachivaches vs muebles) en vez del set de
-Macaw's (una docena de ficheros con solapes parciales).
+Base: Supplementaries (cachivaches) + Another Furniture (muebles) + 3 de Macaw's
+(puertas/ventanas/tejados, sin solape con los anteriores). El resto de Macaw's y
+Chipped quedan opcionales.
 
 ## 9. Comida y agricultura (2)
 
@@ -151,19 +154,22 @@ Macaw's (una docena de ficheros con solapes parciales).
 | Farmer's Delight Refabricated | Cocina y cultivos con progresión (compatible EMI) | ambos | 🟡 | confirmada |
 | AppleSkin | Hambre/saturación visibles en el HUD | cliente | 🟢 | estandar |
 
-## 10. Multijugador y diversión (4)
+## 10. Multijugador y diversión (5)
 
 | Mod | Para qué sirve | Lado | Impacto | Verif. |
 | --- | --- | --- | --- | --- |
-| Simple Voice Chat | Voz por proximidad dentro del juego | ambos | 🟡 | confirmada |
+| Simple Voice Chat | Voz por proximidad (requiere puerto UDP 24454 en servidor) | ambos | 🟡 | confirmada |
 | Emotecraft | Emotes/bailes visibles por todos | ambos | 🟡 | confirmada |
 | Comforts | Sacos de dormir y hamacas (sin liar spawns) | ambos | 🟢 | estandar |
 | Lootr | Loot de cofres instanciado por jugador | ambos | 🟡 | confirmada |
+| Universal Graves | Tumbas con tus objetos y XP al morir | servidor | 🟡 | confirmada |
 
-Simple Voice Chat necesita un **puerto UDP abierto** en el servidor (típ. 24454):
-es el único requisito especial de despliegue de todo el pack.
+Simple Voice Chat necesita un **puerto UDP abierto** en el servidor (24454 por
+defecto): es el requisito principal de despliegue. Además, Universal Graves usa
+Polymer AutoHost: los 3 jugadores aceptan el resource pack del servidor al entrar
+(un clic, mecanismo vanilla).
 
-## 11. Calidad de vida en cliente (8)
+## 11. Calidad de vida e inmersión en cliente (11)
 
 | Mod | Para qué sirve | Lado | Impacto | Verif. |
 | --- | --- | --- | --- | --- |
@@ -175,6 +181,9 @@ es el único requisito especial de despliegue de todo el pack.
 | Mouse Tweaks | Arrastrar/mover objetos con el ratón | cliente | 🟢 | estandar |
 | Mod Menu | Lista de mods y sus configs | cliente | 🟢 | estandar |
 | Chat Heads | Avatares en el chat | cliente | 🟢 | estandar |
+| Sound Physics Remastered | Reverberación/oclusión; integra el chat de voz | cliente | 🟡 | confirmada |
+| Presence Footsteps | Pasos según superficie (se oyen los de otros) | cliente | 🟡 | confirmada |
+| Eating Animation | Comida/bebida animada, visible para los demás | cliente | 🟢 | confirmada |
 
 ## 12. Calidad de vida en supervivencia (3)
 
@@ -195,7 +204,7 @@ es el único requisito especial de despliegue de todo el pack.
 ## 14. Dependencias (resumen de verificación)
 
 Cada dependencia `required` se comprobó por ID de proyecto en la API de Modrinth
-(revisión 2); no se confía en listados de terceros:
+(revisión 3); no se confía en listados de terceros:
 
 - Fabric API ← todo el pack.
 - Cloth Config ← Lootr, Spell Engine, Combat Roll.
@@ -207,6 +216,7 @@ Cada dependencia `required` se comprobó por ID de proyecto en la API de Modrint
 - Friends and Foes ← {Resourceful Lib, Fabric API}. · Naturalist ← {Fabric API}.
 - Better Combat ← {Fabric API, playerAnimator}; Combat Roll ← {Fabric API, Cloth Config, playerAnimator}.
 - WTHIT ← {Fabric API, Bad Packets} (cliente). · Emotecraft ← {Fabric API} (+playerAnimator embebido).
+- Universal Graves ← {Polymer} (servidor). · Macaw's ×3 ← {Fabric API}. · Xaero's World Map ← {Fabric API (+Minimapa opcional)}. · Sound Physics ← {todo opcional}. · Presence Footsteps, Eating Animation ← {sin dependencias}.
 - El resto: solo Fabric API. `resolver.py` re-verifica **todo** en CI antes de fijar versiones.
 
 ## 15. Compatibilidad entre mods (puntos revisados)
@@ -238,21 +248,30 @@ Cada dependencia `required` se comprobó por ID de proyecto en la API de Modrint
 - **Bad Packets**: librería de red exigida por WTHIT; viaja solo en cliente con él.
 - **Trinkets**: exigido por Spell Engine (slot del libro de hechizos); estándar
   de Fabric con versión 1.21.1.
+- **Universal Graves + Polymer**: 100% servidor (coste 0 en cliente); AutoHost sirve
+  el resource pack (aceptar al entrar). Sustituye a Corpse, que no tiene Fabric.
+- **Macaw's ×3**: sin solape (Supplementaries/Another Furniture no hacen
+  puertas/ventanas/tejados); cada uno solo pide Fabric API.
+- **Sound Physics + SVC**: integración oficial voz↔reverberación; si la build alpha
+  diera guerra, se retira sin tocar el servidor (es solo cliente).
+- **Almacén sin mod dedicado**: TR Quantum + vanilla; cero riesgo de abandonos.
 
 ## 16. Estimación de RAM y veredicto de carga (revisión 2)
 
 Tamaños de `.jar` verificados (los más grandes): Naturalist 11,3 MB · Tech Reborn
-6,4 MB · Simple Voice Chat 6,3 MB · Friends and Foes 5,1 MB · Spell Engine 4,7 MB ·
-Wizards 4,5 MB · Farmer's Delight 2,9 MB · Terralith 2,8 MB · Another Furniture
-2,3 MB. Total a descargar por cliente ≈ 65–75 MB (una sola vez).
+6,4 MB · Simple Voice Chat 6,3 MB · Presence Footsteps 5,7 MB (sonidos) ·
+Friends and Foes 5,1 MB · Spell Engine 4,7 MB · Wizards 4,5 MB · Farmer's Delight
+2,9 MB · Terralith 2,8 MB · Another Furniture 2,3 MB · Macaw's ×3 ≈ 4,2 MB ·
+Xaero's World Map 1,5 MB · Universal Graves 1,7 MB* (*solo servidor). Total por
+cliente ≈ 75–90 MB (una sola vez).
 
 - **Cliente (3 GB)**: base 1.21.1/Fabric ≈ 1,2–1,5 GB + contenido ≈ 0,8–1,1 GB −
   ahorro de FerriteCore/Sodium. **Veredicto: CABE con margen** (~2–2,6 GB en juego
   normal). Los 6 únicos 🟠 (Terralith*, Better Nether/End, Naturalist, Wizards,
   Tech Reborn) no pican a la vez: *Terralith solo trabaja en servidor. Condición:
   sin shaders ni packs HD (Iris queda opcional).
-- **Servidor (4 GB)**: base ≈ 1 GB + worldgen y entidades (4–6 jugadores) ≈
-  1,5–2,5 GB. **Veredicto: CABE** con pre-generación Chunky (radio 3k–5k),
+- **Servidor (4 GB)**: base ≈ 1 GB + worldgen y entidades (3 jugadores: tú, Rafa y Dani) ≈
+  1,5–2,5 GB. **Veredicto: CABE** con pre-generación Chunky (radio 3k–4k, de sobra para 3),
   `view-distance` 6–8, `simulation-distance` 4–6 y flags G1GC/Aikar. El combo
   Terralith + YUNG's ×4 + Structory + T&T es viable: las estructuras solo cuestan
   al generar el chunk (checks baratos + eventos raros); Terralith es el único coste
@@ -265,20 +284,15 @@ Wizards 4,5 MB · Farmer's Delight 2,9 MB · Terralith 2,8 MB · Another Furnitu
 - Cuello de botella esperado: **generación de chunks al explorar** (Chunky +
   Noisium lo mitigan), no la RAM en reposo.
 
-## 17. Opcionales (17, no incluidos salvo petición)
+## 17. Opcionales (10, no incluidos salvo petición)
 
 | Mod | Lado | Por qué es opcional |
 | --- | --- | --- |
 | Iris Shaders | cliente | Shaders con 3 GB solo para GPUs potentes; cada jugador decide |
-| Xaero's World Map | cliente | Mapa completo: más RAM/disco que el minimapa |
-| Litematica + Malilib | cliente | Solo para constructores (planos) |
-| Sound Physics Remastered | cliente | Reverberación; combina con el chat de voz |
-| Presence Footsteps | cliente | Pasos según superficie; atmósfera gratis |
-| Not Enough Animations | cliente | Animaciones en 1.ª persona |
-| Eating Animation | cliente | Animación al comer (verificada; cliente puro) |
-| Tectonic | servidor | Terreno aún más épico, pero sube coste de generación |
-| Chipped (+ Architectury) | ambos | Miles de variantes (jar 14,3 MB); solo si sobra RAM |
-| Macaw's Doors/Windows/Roofs | ambos | Más deco si se quiere variedad extra |
+| Litematica + Malilib | cliente | Nicho de constructores; añadible por cada uno |
+| Not Enough Animations | cliente | Solo tu propia vista; añadible por cada uno |
+| Tectonic | servidor | Más épico, pero arriesga los 4 GB; Terralith basta |
+| Chipped (+ Architectury) | ambos | Miles de variantes (14,3 MB); Macaw's cubre deco con ~4 MB |
 | LuckPerms | servidor | Solo si hacen falta rangos más allá de OP |
 | No Chat Reports | ambos | Quita reportes a Mojang (servidor privado) |
 | ServerCore | servidor | Solo si Lithium no bastara; solapa parcial |
@@ -317,15 +331,19 @@ o no por su cuenta.
 | AzureLib Armor | El stack RPG usa Armor Model API |
 | Reap (`reap`) | Slug erróneo: es otro mod (solo MC 26.2) → Simple Harvest |
 | Badges Lib (`badges-lib`) | Slug inexistente (404) → Bad Packets |
-| DeathLog | Sin build 1.21.1; Corpse cubre la necesidad |
+| DeathLog | Sin build 1.21.1; las tumbas las cubre Universal Graves |
+| Expanded Storage | Archivado/abandonado (decisión del usuario); almacén via TR + vanilla |
+| Corpse | Sin versión Fabric (forge+neoforge); sustituido por Universal Graves |
+| Villager Names | Sin build 1.21.1 (abandonado en 2024); capricho menor |
+| Nature's Compass (`nature-s-compass`) | Slug inexistente (404) → `natures-compass` |
 
 ## 19. Decisiones que necesito de ti
 
-1. **Aprobar / recortar / cambiar** esta selección (75 core + 17 opcionales, rev 2).
-2. **Simple Voice Chat**: ¿OK abrir un puerto UDP en el servidor? (Si no, se quita.)
-3. **Expanded Storage**: ¿aceptas el mod archivado (v1.21.1 estable fijada) o lo
-   quitamos y queda Tech Reborn + vanilla?
-4. **Opcionales**: ¿alguno pasa a core? (p. ej. Xaero's World Map, Tectonic, Chipped).
+1. **Aprobar / recortar / cambiar** esta selección (81 core + 10 opcionales, rev 3).
+2. **Simple Voice Chat**: ✅ se queda; documentado requisito UDP 24454.
+3. **Expanded Storage**: ✅ eliminado por archivado; almacén via TR + vanilla.
+4. **Opcionales**: ✅ triage hecho — promocionan World Map, Sound Physics,
+   Footsteps, Eating Animation y Macaw's ×3; el resto fuera (ver §17).
 5. **Dificultad**: LevelZ + Better Combat asumen progresión suave. ¿Quieres más
    desafío (más hostiles/jefes) o así está bien para empezar?
 
@@ -346,3 +364,9 @@ o no por su cuenta.
   Armor Model API, Ranged Weapon API, Trinkets, Resourceful Lib, Bad Packets,
   Simple Harvest. Corregidos: `reborncore` (slug), Towns and Towers → solo
   servidor. Resultado: 75 core + 17 opcionales, 0 pendientes en core.
+- **Rev 3**: decisiones de usuario (3 jugadores) + triage de opcionales. Eliminados:
+  Expanded Storage, Corpse (sin Fabric), Villager Names (sin 1.21.1). Promocionan
+  a core: Xaero's World Map, Sound Physics, Footsteps, Eating Animation,
+  Macaw's ×3. Nuevos: Universal Graves + Polymer (sustituyen a Corpse, 100%
+  servidor). Corregido slug `natures-compass`. SVC confirmado con UDP 24454.
+  Resultado: 81 core + 10 opcionales, 0 pendientes en core.

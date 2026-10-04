@@ -110,7 +110,10 @@ def mejor_version(slug: str, mc: str, loader: str):
     if not versiones:
         return proyecto, None
     orden = {"release": 0, "beta": 1, "alpha": 2}
-    versiones.sort(key=lambda v: (orden.get(v.get("version_type", "release"), 3), v.get("date_published", "")))
+    # Estable: primero lo más nuevo, luego por canal -> gana la release más reciente
+    # (solo se usa beta/alpha si no existe release para 1.21.1/Fabric).
+    versiones.sort(key=lambda v: v.get("date_published", ""), reverse=True)
+    versiones.sort(key=lambda v: orden.get(v.get("version_type", "release"), 3))
     return proyecto, versiones[0]
 
 
