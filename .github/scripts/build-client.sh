@@ -51,7 +51,7 @@ resolve_mod() {
             .[]
             | select(
                 (.version_number | ltrimstr("v")) as $n
-                | ($n == $base or ($n | startswith($base + "-")) or ($n | startswith($base + "+")) or ($n | endswith("-" + $base)) or ($n | endswith("+" + $base)))
+                | ($n == $base or ($n | startswith($base + "-")) or ($n | startswith($base + "+")) or ($n | endswith("-" + $base)) or ($n | endswith("+" + $base)) or ($n | contains("-" + $base + "-")) or ($n | contains("-" + $base + "+")) or ($n | contains("+" + $base + "-")) or ($n | contains("+" + $base + "+")))
               )
           ]
         | (map(select(.version_type == "release")) | if length > 0 then . else [] end)
