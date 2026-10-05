@@ -2,7 +2,16 @@ minecraft: "1.21.1"
 loader: "fabric"
 loader_version: "0.19.5"
 
-# Exact top-level mods observed in the running server.
+# Top-level Modrinth projects for the client pack (84 entries in modpack/mods.txt):
+# the 68 mods observed in the running server plus 16 client-side additions
+# (performance/render, maps, HUD, immersive audio and the decoration mods
+# Chipped, Handcrafted and Jade).
+# Required Modrinth dependencies are resolved and downloaded transitively by
+# .github/scripts/build-client.sh, which prefers the exact version a
+# dependency declares. Chipped needs Resourceful Lib (already shipped) and one
+# more library resolved by id; Handcrafted needs Resourceful Lib; Jade has no
+# dependencies. Architectury API is deliberately not included because nothing
+# in the pack requires it.
 # MCServerHost is intentionally not included in the client pack because it is server-host integration.
 # Fabric Loader and Java are runtime components, not client mods.
 mods_file: "modpack/mods.txt"
