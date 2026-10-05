@@ -56,18 +56,18 @@ jobs:
       - name: Validate server package
         run: |
           set -euo pipefail
-          test -f artifact/servidor.zip
-          test -s artifact/servidor.zip
-          unzip -t artifact/servidor.zip >/dev/null
+          test -f artifact/build/servidor.zip
+          test -s artifact/build/servidor.zip
+          unzip -t artifact/build/servidor.zip >/dev/null
           echo "servidor.zip is present and is a valid ZIP archive."
-          ls -lh artifact/servidor.zip
+          ls -lh artifact/build/servidor.zip
 
       - name: Extract server package
         run: |
           set -euo pipefail
           rm -rf deploy
           mkdir -p deploy
-          unzip -q artifact/servidor.zip -d deploy
+          unzip -q artifact/build/servidor.zip -d deploy
           test -n "$(find deploy -type f -print -quit)"
           echo "Prepared deployment payload:"
           find deploy -type f -printf '%P\n' | sort | head -200
