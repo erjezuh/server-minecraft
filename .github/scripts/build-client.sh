@@ -39,6 +39,12 @@ resolve_mod() {
   local version_id
   version_id="$(jq -r --arg v "$wanted_version" '[.[] | select(.version_number == $v)][0].id // empty' <<<"$versions_json")"
 
+  # Some Modrinth versions include a Minecraft prefix (for example mc1.21-1.9.0)
+  # while the server manifest stores the semantic version only (1.9.0).
+  if [[ -z "$version_id" ]]; then
+    version_id="$(jq -r --arg v "$wanted_version" '[.[] | select(.version_number | endswith("-" + $v))] | if length == 1 then .[0].id else empty end' <<<"$versions_json")"
+  fi
+
   if [[ -z "$version_id" ]]; then
     echo "::error::Could not resolve exact Modrinth version: $slug @ $wanted_version"
     jq -r '.[0:10][] | "  " + .version_number + " (" + .id + ")"' <<<"$versions_json" || true
