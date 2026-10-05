@@ -33,16 +33,15 @@ resolve_mod() {
   echo "Resolving $slug @ $wanted_version"
 
   local versions_json
-  versions_json="$(curl -fsSL --retry 3 --retry-all-errors \
-    "https://api.modrinth.com/v2/project/$slug/version?game_versions=%5B%22$MC_VERSION%22%5D&loaders=%5B%22$LOADER%22%5D")"
+  versions_json="$(curl -fsSL --retry 3 --retry-all-errors     "https://api.modrinth.com/v2/project/$slug/version?game_versions=%5B%22$MC_VERSION%22%5D&loaders=%5B%22$LOADER%22%5D")"
 
   local version_id
   version_id="$(jq -r --arg v "$wanted_version" '[.[] | select(.version_number == $v)][0].id // empty' <<<"$versions_json")"
 
-  # Some Modrinth versions include a Minecraft prefix (for example mc1.21-1.9.0)
-  # while the server manifest stores the semantic version only (1.9.0).
+  # Modrinth may decorate the pinned version with a prefix or suffix.
+  # Examples: mc1.21-1.9.0 and 3.1.3+1.21.1-fabric.
   if [[ -z "$version_id" ]]; then
-    version_id="$(jq -r --arg v "$wanted_version" '[.[] | select(.version_number | endswith("-" + $v))] | if length == 1 then .[0].id else empty end' <<<"$versions_json")"
+    version_id="$(jq -r --arg v "$wanted_version" '[.[] | select((.version_number | startswith($v + "-")) or (.version_number | endswith("-" + $v)))] | if length == 1 then .[0].id else empty end' <<<"$versions_json")"
   fi
 
   if [[ -z "$version_id" ]]; then
@@ -66,7 +65,7 @@ resolve_mod() {
   echo "  -> $filename"
   curl -fL --retry 3 --retry-all-errors "$primary" -o "build/client/mods/$filename"
 
-  while IFS=$'\t' read -r dep_project dep_version dep_type; do
+  while IFS=$'	' read -r dep_project dep_version dep_type; do
     [[ -z "$dep_project" || "$dep_type" != "required" ]] && continue
     [[ -z "$dep_version" || "$dep_version" == "null" ]] && continue
 
@@ -78,7 +77,7 @@ resolve_mod() {
 }
 
 while IFS='|' read -r slug version; do
-  [[ -z "$slug" || "$slug" == \#* ]] && continue
+  [[ -z "$slug" || "$slug" == #* ]] && continue
   resolve_mod "$slug" "$version"
 done < modpack/mods.txt
 
