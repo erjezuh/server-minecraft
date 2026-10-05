@@ -91,22 +91,7 @@ resolve_mod() {
 
   echo "  -> $filename"
   local downloaded=0
-  while IFS=$'\t' read -r file_url file_name; do
-    [[ -z "$file_url" || -z "$file_name" ]] && continue
-    echo "  -> trying $file_name"
-    if curl -fL --retry 2 --retry-all-errors "$file_url" -o "build/client/mods/$file_name"; then
-      downloaded=1
-      filename="$file_name"
-      break
-    fi
-    rm -f "build/client/mods/$file_name"
-    echo "  -> download failed, trying next Modrinth file"
-  done < <(jq -r '.files[] | [.url, .filename] | @tsv' <<<"$version_json")
-
-  if [[ "$downloaded" -ne 1 ]]; then
-    echo "::error::No downloadable file succeeded for $slug @ $version_number"
-    return 1
-  fi
+  while IFS=
 
   while IFS=$'\t' read -r dep_project dep_version dep_type; do
     [[ -z "$dep_project" || "$dep_type" != "required" ]] && continue
@@ -152,7 +137,7 @@ ls -lh build/minecraft-client-1.21.1-fabric.zip
 \t' read -r file_url file_name; do
     [[ -z "$file_url" || -z "$file_name" ]] && continue
     echo "  -> trying $file_name"
-    if curl -fL --retry 2 --retry-all-errors "$file_url" -o "build/client/mods/$file_name"; then
+    if curl -fL --retry 2 --retry-delay 1 "$file_url" -o "build/client/mods/$file_name"; then
       downloaded=1
       filename="$file_name"
       break
@@ -160,6 +145,19 @@ ls -lh build/minecraft-client-1.21.1-fabric.zip
     rm -f "build/client/mods/$file_name"
     echo "  -> download failed, trying next Modrinth file"
   done < <(jq -r '.files[] | [.url, .filename] | @tsv' <<<"$version_json")
+
+  if [[ "$downloaded" -ne 1 ]]; then
+    local project_id
+    project_id="$(jq -r '.project_id // empty' <<<"$version_json")"
+    if [[ -n "$project_id" && -n "$filename" ]]; then
+      echo "  -> trying Modrinth CDN fallback"
+      if curl -fL --retry 2 --retry-delay 1 "https://cdn.modrinth.com/data/$project_id/versions/$version_id/$filename" -o "build/client/mods/$filename"; then
+        downloaded=1
+      else
+        rm -f "build/client/mods/$filename"
+      fi
+    fi
+  fi
 
   if [[ "$downloaded" -ne 1 ]]; then
     echo "::error::No downloadable file succeeded for $slug @ $version_number"
