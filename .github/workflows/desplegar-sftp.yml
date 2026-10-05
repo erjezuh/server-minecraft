@@ -79,6 +79,13 @@ jobs:
           sudo apt-get install -y -qq sshpass
           sshpass -V
 
+      - name: Remove obsolete Voice Chat mod from deployment payload
+        run: |
+          set -euo pipefail
+          find deploy -type f -iname 'voicechat-*.jar' -print -delete || true
+          echo "Voice Chat jars present in deployment payload after cleanup:"
+          find deploy -type f -iname 'voicechat-*.jar' -print
+
       - name: Upload server files via OpenSSH SFTP
         env:
           SSHPASS: ${{ secrets.SFTP_PASSWORD }}
@@ -91,10 +98,15 @@ jobs:
 
           cd deploy
 
-          # Use the native OpenSSH SFTP client instead of the third-party action.
-          # This avoids the action's SSH-agent initialization failure.
-          sshpass -e sftp             -o StrictHostKeyChecking=no             -o UserKnownHostsFile=/dev/null             -o PreferredAuthentications=password             -o PubkeyAuthentication=no             -P "$SFTP_PORT"             "$SFTP_USER@$SFTP_HOST" <<EOF
+          sshpass -e sftp \
+            -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null \
+            -o PreferredAuthentications=password \
+            -o PubkeyAuthentication=no \
+            -P "$SFTP_PORT" \
+            "$SFTP_USER@$SFTP_HOST" <<EOF
           cd "$SFTP_REMOTE_PATH"
+          rm mods/voicechat-*.jar
           put -r *
           EOF
 
@@ -104,4 +116,4 @@ jobs:
         run: |
           echo "SFTP upload completed."
           echo "Remote path: configured through GitHub Secret SFTP_REMOTE_PATH"
-          echo "The workflow did not issue a remote restart or delete remote files."
+          echo "Voice Chat was removed from the deployment payload and any matching remote mods/voicechat-*.jar was deleted."
