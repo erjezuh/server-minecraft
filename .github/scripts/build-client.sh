@@ -90,7 +90,65 @@ resolve_mod() {
   }
 
   echo "  -> $filename"
-  curl -fL --retry 3 --retry-all-errors "$primary" -o "build/client/mods/$filename"
+  local downloaded=0
+  while IFS=
+  while IFS=$'\t' read -r dep_project dep_version dep_type; do
+    [[ -z "$dep_project" || "$dep_type" != "required" ]] && continue
+    [[ -z "$dep_version" || "$dep_version" == "null" ]] && continue
+    local dep_slug dep_ver
+    dep_slug="$(curl -fsSL --retry 3 --retry-all-errors "https://api.modrinth.com/v2/project/$dep_project" | jq -r '.slug')"
+    dep_ver="$(curl -fsSL --retry 3 --retry-all-errors "https://api.modrinth.com/v2/version/$dep_version" | jq -r '.version_number')"
+    resolve_mod "$dep_slug" "$dep_ver"
+  done < <(jq -r '.dependencies[]? | [.project_id // "", .version_id // "", .dependency_type // ""] | @tsv' <<<"$version_json")
+}
+
+while IFS='|' read -r slug version; do
+  [[ -z "$slug" ]] && continue
+  case "$slug" in
+    #*) continue ;;
+  esac
+  resolve_mod "$slug" "$version"
+done < modpack/mods.txt
+
+find build/client/mods -type f -iname 'voicechat-*.jar' -delete
+
+count="$(find build/client/mods -maxdepth 1 -type f -name '*.jar' | wc -l)"
+echo "Client JAR count: $count"
+test "$count" -gt 0
+
+cat > build/client/README.txt <<EOF
+Minecraft 1.21.1 Fabric $LOADER_VERSION
+Generated automatically by GitHub Actions.
+Mod versions are resolved through the Modrinth API.
+Pinned versions use exact matches when available, otherwise compatible release metadata.
+Required dependencies use their exact Modrinth version IDs.
+Voice Chat is intentionally excluded.
+EOF
+
+cp modpack/modpack.yml build/client/modpack.yml
+
+(
+  cd build/client
+  zip -qr ../minecraft-client-1.21.1-fabric.zip .
+)
+
+ls -lh build/minecraft-client-1.21.1-fabric.zip
+\t' read -r file_url file_name; do
+    [[ -z "$file_url" || -z "$file_name" ]] && continue
+    echo "  -> trying $file_name"
+    if curl -fL --retry 2 --retry-all-errors "$file_url" -o "build/client/mods/$file_name"; then
+      downloaded=1
+      filename="$file_name"
+      break
+    fi
+    rm -f "build/client/mods/$file_name"
+    echo "  -> download failed, trying next Modrinth file"
+  done < <(jq -r '.files[] | [.url, .filename] | @tsv' <<<"$version_json")
+
+  if [[ "$downloaded" -ne 1 ]]; then
+    echo "::error::No downloadable file succeeded for $slug @ $version_number"
+    return 1
+  fi
 
   while IFS=$'\t' read -r dep_project dep_version dep_type; do
     [[ -z "$dep_project" || "$dep_type" != "required" ]] && continue
