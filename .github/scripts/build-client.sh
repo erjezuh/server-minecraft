@@ -40,42 +40,35 @@ resolve_mod() {
     ' <<<"$versions_json")"
 
     if [[ -z "$version_id" ]]; then
+      # Treat the pinned value as the base semantic version. Modrinth often
+      # decorates it with loader/MC suffixes, e.g. 1.8.0-fabric-21.1.
+      # Select the unique release whose version begins with that base and is
+      # followed by a separator, preferring the first listed release if
+      # multiple release builds share the same base.
       version_id="$(jq -r --arg v "$wanted_version" '
         ($v | split("+")[0]) as $base
-        | [.[] | select(
-            ((.version_number | ltrimstr("v")) == $base)
-            or ((.version_number | ltrimstr("v")) | startswith($base + "-"))
-            or ((.version_number | ltrimstr("v")) | startswith($base + "+"))
-          )]
-        | if (length == 1) then .[0].id
-          else (map(select(.version_type == "release")) | if length == 1 then .[0].id else empty end)
-          end
+        | [
+            .[]
+            | select(
+                (.version_number | ltrimstr("v")) as $n
+                | ($n == $base or ($n | startswith($base + "-")) or ($n | startswith($base + "+")))
+              )
+          ]
+        | (map(select(.version_type == "release")) | if length > 0 then . else [] end)
+        | .[0].id // empty
       ' <<<"$versions_json")"
     fi
 
     if [[ -z "$version_id" ]]; then
-      version_id="$(jq -r --arg v "$wanted_version" '
-        ($v | split("+")[0]) as $base
-        | [.[] | select(
-            (.version_number | ltrimstr("v")) == $base
-            or ((.version_number | ltrimstr("v")) | contains($base))
-          )]
-        | if (length == 1) then .[0].id
-          else (map(select(.version_type == "release")) | if length == 1 then .[0].id else empty end)
-          end
-      ' <<<"$versions_json")"
+      echo "::error::Could not resolve compatible Modrinth version: $slug @ $wanted_version"
+      jq -r '.[0:12][] | "  " + .version_number + " [" + .version_type + "] (" + .id + ")"' <<<"$versions_json" || true
+      return 1
     fi
   else
     version_id="$(jq -r '
       [.[] | select(.status == "listed" and .version_type == "release")]
       | .[0].id // empty
     ' <<<"$versions_json")"
-  fi
-
-  if [[ -z "$version_id" ]]; then
-    echo "::error::Could not resolve compatible Modrinth version: $slug @ ${wanted_version:-latest}"
-    jq -r '.[0:12][] | "  " + .version_number + " [" + .version_type + "] (" + .id + ")"' <<<"$versions_json" || true
-    return 1
   fi
 
   if [[ -n "${SEEN_VERSIONS[$version_id]:-}" ]]; then
