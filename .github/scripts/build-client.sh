@@ -91,7 +91,23 @@ resolve_mod() {
 
   echo "  -> $filename"
   local downloaded=0
-  while IFS=
+  while IFS=$'\t' read -r file_url file_name; do
+    [[ -z "$file_url" || -z "$file_name" ]] && continue
+    echo "  -> trying $file_name"
+    if curl -fL --retry 2 --retry-all-errors "$file_url" -o "build/client/mods/$file_name"; then
+      downloaded=1
+      filename="$file_name"
+      break
+    fi
+    rm -f "build/client/mods/$file_name"
+    echo "  -> download failed, trying next Modrinth file"
+  done < <(jq -r '.files[] | [.url, .filename] | @tsv' <<<"$version_json")
+
+  if [[ "$downloaded" -ne 1 ]]; then
+    echo "::error::No downloadable file succeeded for $slug @ $version_number"
+    return 1
+  fi
+
   while IFS=$'\t' read -r dep_project dep_version dep_type; do
     [[ -z "$dep_project" || "$dep_type" != "required" ]] && continue
     [[ -z "$dep_version" || "$dep_version" == "null" ]] && continue
