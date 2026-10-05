@@ -4,12 +4,18 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - name: Checkout repository
@@ -27,8 +33,33 @@ jobs:
           mkdir -p build/server
           cp -r server/. build/server/ 2>/dev/null || true
 
-      - name: Build exact client modpack
+      - name: Validate client build tools
+        run: |
+          set -euo pipefail
+          for tool in bash curl jq zip unzip sha256sum sha1sum sha512sum python3; do
+            command -v "$tool" >/dev/null || {
+              echo "::error::Required client build tool is missing: $tool"
+              exit 1
+            }
+          done
+          bash -n .github/scripts/build-client.sh
+          python3 -m py_compile .github/scripts/test-build-client.py
+
+      - name: Test client resolver against offline Modrinth fixtures
+        run: python3 .github/scripts/test-build-client.py
+
+      - name: Build client modpack
         run: bash .github/scripts/build-client.sh
+
+      - name: Verify generated client ZIP
+        run: |
+          set -euo pipefail
+          test -s build/minecraft-client-1.21.1-fabric.zip
+          unzip -tq build/minecraft-client-1.21.1-fabric.zip
+          echo "Client archive contents:"
+          unzip -Z1 build/minecraft-client-1.21.1-fabric.zip | sort | head -200
+          echo "Client archive SHA-256:"
+          sha256sum build/minecraft-client-1.21.1-fabric.zip
 
       - name: Upload server artifact
         uses: actions/upload-artifact@v4
