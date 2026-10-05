@@ -17,6 +17,7 @@ modrinth_slug() {
   case "$1" in
     worldweaver) echo "world-weaver" ;;
     common-storage-library) echo "common-storage-lib" ;;
+    cristellib) echo "cristel-lib" ;;
     better-dungeons) echo "yungs-better-dungeons" ;;
     betterfortresses) echo "yungs-better-nether-fortresses" ;;
     bettermineshafts) echo "yungs-better-mineshafts" ;;
