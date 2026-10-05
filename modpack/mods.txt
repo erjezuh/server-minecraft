@@ -27,7 +27,7 @@ emotecraft|2.4.12
 entityculling|1.11.2
 fabric-api|0.116.17+1.21.1
 fabric-language-kotlin|1.14.1+kotlin.2.4.20
-fallingtree|1.21.1.11
+fallingtree|1.21.1-1.21.1.11
 farmers-delight-refabricated|1.21.1-3.3.6
 ferrite-core|7.0.3
 forge-config-api-port|21.1.6
@@ -52,14 +52,14 @@ moreculling|1.0.10
 naturalist|2.0.5
 natures-compass|1.21.1-2.6.0-fabric
 noisium|2.3.0+mc1.21-1.21.1
-playeranimator|2.0.4+1.21.1
+playeranimator|2.0.4+1.21.1-fabric
 polymer|0.9.19+1.21.1
 presence-footsteps|1.11.2+1.21
 puzzles-lib|21.1.62
 ranged-weapon-api|3.0.0+1.21.1
 reborncore|5.11.19
 resourceful-lib|3.0.12
-right-click-harvest|1.0.0-1.21.x
+right-click-harvest|4.6.1+1.21.1
 runes|1.3.2+1.21.1
 simple-voice-chat|fabric-1.21.1-2.6.22
 sodium-extra|mc1.21.1-0.9.4+fabric
