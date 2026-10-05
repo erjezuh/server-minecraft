@@ -45,8 +45,17 @@ jobs:
           mkdir -p build/client/mods
           declare -A SEEN_PROJECTS=()
 
+          # Map IDs from the server log to their public Modrinth project slugs.
+          modrinth_slug() {
+            case "$1" in
+              worldweaver) echo "world-weaver" ;;
+              common-storage-library) echo "common-storage" ;;
+              *) echo "$1" ;;
+            esac
+          }
+
           resolve_mod() {
-            local slug="$1"
+            local slug="$(modrinth_slug "$1")"
             local wanted_version="$2"
             if [[ -n "${SEEN_PROJECTS[$slug]:-}" ]]; then return 0; fi
             SEEN_PROJECTS[$slug]=1
