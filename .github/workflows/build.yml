@@ -97,6 +97,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          API_USER_AGENT: "server-minecraft-modpack-builder/1.0.0 (https://github.com/erjezuh/server-minecraft)"
+          MODRINTH_API_BASE_URL: "https://api.modrinth.com/v2"
           CLIENT_BUILD_OUTCOME: ${{ steps.client_build.outcome }}
           VERIFY_OUTCOME: ${{ steps.verify_zip.outcome }}
           JAR_COUNT: ${{ steps.verify_zip.outputs.jar_count || '' }}
@@ -167,6 +169,41 @@ jobs:
               echo ""
             } >> "$report"
           fi
+
+          # Real Modrinth metadata for the projects whose dependencies matter
+          # most for this pack, so pins can be checked without a client.
+          {
+            echo "### Dependency audit (real Modrinth metadata, 1.21.1 + fabric)"
+            echo ""
+          } >> "$report"
+          for slug in chipped handcrafted jade sodium sodium-extra indium architectury-api; do
+            project_json="$(curl -fsSL -A "$API_USER_AGENT" "$MODRINTH_API_BASE_URL/project/$slug" 2>/dev/null || echo '{}')"
+            project_id="$(jq -r '.id // empty' <<<"$project_json")"
+            project_title="$(jq -r '.title // empty' <<<"$project_json")"
+            if [ -z "$project_id" ]; then
+              echo "- \`$slug\`: project lookup failed" >> "$report"
+              continue
+            fi
+            versions_json="$(curl -fsSL -A "$API_USER_AGENT" \
+              "$MODRINTH_API_BASE_URL/project/$project_id/version?game_versions=%5B%221.21.1%22%5D&loaders=%5B%22fabric%22%5D" 2>/dev/null || echo '[]')"
+            {
+              echo ""
+              echo "<details><summary><code>$slug</code> ($project_title, id <code>$project_id</code>) — newest 1.21.1/fabric builds</summary>"
+              echo ""
+              echo '```'
+              jq -r '
+                sort_by(.date_published // "") | reverse | .[0:8][]
+                | "\(.version_number) [\(.version_type)] \(.date_published[0:10]) required-deps: "
+                  + ((.dependencies // []) | map(select((.dependency_type // "") == "required"))
+                     | map((.project_id // "-") + "@" + ((.version_id // "any")[0:8]))
+                     | join(", ")
+                     | if . == "" then "(none)" else . end)
+              ' <<<"$versions_json"
+              echo '```'
+              echo ""
+              echo "</details>"
+            } >> "$report"
+          done
 
           if [ "${CLIENT_BUILD_OUTCOME:-}" != "success" ] || [ "${VERIFY_OUTCOME:-}" != "success" ]; then
             {
