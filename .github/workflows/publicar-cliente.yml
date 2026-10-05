@@ -109,6 +109,16 @@ jobs:
             exit 1
           fi
 
+          contents="$RUNNER_TEMP/client-archive-contents.txt"
+          unzip -Z1 "$zip_path" | sort > "$contents"
+
+          sodium_jar="$(grep -Ei '^mods/.*sodium.*\.jar$' "$contents" | grep -Eiv '^mods/(sodium-extra|sodiumoptionsapi|sodiumdynamiclights|indium)' | head -1 || true)"
+          if [ -z "$sodium_jar" ]; then
+            echo "::error::Sodium is missing from the client ZIP $CLIENT_ZIP_NAME."
+            exit 1
+          fi
+          echo "Sodium verified inside the client ZIP: $sodium_jar"
+
           zip_sha256="$(sha256sum "$zip_path" | awk '{print $1}')"
           zip_bytes="$(stat -c %s "$zip_path")"
           zip_human="$(du -h "$zip_path" | cut -f1 | tr -d '[:space:]')"
@@ -119,6 +129,8 @@ jobs:
             echo "bytes=$zip_bytes"
             echo "size=$zip_human"
             echo "mod_count=$mod_count"
+            echo "sodium_jar=$sodium_jar"
+            echo "contents=$contents"
           } >> "$GITHUB_OUTPUT"
 
           echo "Client ZIP:      $CLIENT_ZIP_NAME ($zip_human, $mod_count mod JARs)"
@@ -135,6 +147,8 @@ jobs:
           ZIP_BYTES: ${{ steps.zip.outputs.bytes }}
           ZIP_SIZE: ${{ steps.zip.outputs.size }}
           MOD_COUNT: ${{ steps.zip.outputs.mod_count }}
+          SODIUM_JAR: ${{ steps.zip.outputs.sodium_jar }}
+          CONTENTS: ${{ steps.zip.outputs.contents }}
           REPO_URL: ${{ github.server_url }}/${{ github.repository }}
         run: |
           set -euo pipefail
@@ -147,11 +161,24 @@ jobs:
           - Source build run: [$BUILD_RUN_ID]($REPO_URL/actions/runs/$BUILD_RUN_ID)
           - Source commit: \`$TARGET_SHA\`
           - Asset: \`$CLIENT_ZIP_NAME\` ($ZIP_SIZE, $MOD_COUNT mod JARs)
+          - Sodium included: \`$SODIUM_JAR\` (verified inside the archive before publishing)
           - SHA-256: \`$ZIP_SHA256\`
           - Size in bytes: $ZIP_BYTES
 
           Unzip the archive into your \`.minecraft\` directory (or a dedicated instance) and launch it with Fabric Loader.
           EOF
+
+          {
+            echo ""
+            echo "<details><summary>Mods inside $CLIENT_ZIP_NAME ($MOD_COUNT JARs)</summary>"
+            echo ""
+            echo '```'
+            grep -E '^mods/.*\.jar$' "$CONTENTS" | sed 's|^mods/||'
+            echo '```'
+            echo ""
+            echo "</details>"
+          } >> "$notes_file"
+
           echo "path=$notes_file" >> "$GITHUB_OUTPUT"
 
       - name: Publish GitHub release

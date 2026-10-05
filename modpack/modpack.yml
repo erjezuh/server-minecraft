@@ -2,7 +2,13 @@ minecraft: "1.21.1"
 loader: "fabric"
 loader_version: "0.19.5"
 
-# Exact top-level mods observed in the running server.
+# Top-level Modrinth projects for the client pack (84 entries in modpack/mods.txt):
+# the 68 mods observed in the running server plus 16 client-side additions
+# (performance/render, maps, HUD, voice chat and the decoration mods
+# Chipped, Handcrafted and Jade).
+# Required Modrinth dependencies (for example Architectury API for the
+# decoration mods) are resolved and downloaded transitively by
+# .github/scripts/build-client.sh.
 # MCServerHost is intentionally not included in the client pack because it is server-host integration.
 # Fabric Loader and Java are runtime components, not client mods.
 mods_file: "modpack/mods.txt"

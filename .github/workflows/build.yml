@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   build:
@@ -42,17 +43,168 @@ jobs:
         run: python3 .github/scripts/test-build-client.py
 
       - name: Build client modpack
-        run: bash .github/scripts/build-client.sh
+        id: client_build
+        run: |
+          set -o pipefail
+          mkdir -p build
+          bash .github/scripts/build-client.sh 2>&1 | tee build/build-client.log
 
       - name: Verify generated client ZIP
+        id: verify_zip
         run: |
           set -euo pipefail
-          test -s build/minecraft-client-1.21.1-fabric.zip
-          unzip -tq build/minecraft-client-1.21.1-fabric.zip
+
+          zip_path="build/minecraft-client-1.21.1-fabric.zip"
+          test -s "$zip_path"
+          unzip -tq "$zip_path"
+
           echo "Client archive contents:"
-          unzip -Z1 build/minecraft-client-1.21.1-fabric.zip | sort | head -200
+          unzip -Z1 "$zip_path" | sort | head -200
+
+          unzip -Z1 "$zip_path" | sort > build/client-archive-contents.txt
+          jar_list="$(grep -E '^mods/.*\.jar$' build/client-archive-contents.txt | sort)"
+
+          jar_count="$(printf '%s\n' "$jar_list" | grep -Ec '.+' || true)"
+          echo "Client mod JAR count: $jar_count"
+          test "$jar_count" -gt 0
+
+          # Every manifest entry that the pack promises must be visible in the
+          # archive. Sodium, Chipped, Handcrafted and Jade are tracked
+          # explicitly because they are the newest additions to the pack.
+          for expected in sodium chipped handcrafted jade; do
+            match="$(printf '%s\n' "$jar_list" | grep -Eiv '^mods/(sodium-extra|sodiumoptionsapi|sodiumdynamiclights|indium)' | grep -Ei "mods/.*${expected}.*\.jar" | head -1 || true)"
+            if [ -z "$match" ]; then
+              echo "::error::Expected client mod '$expected' is missing from $zip_path"
+              exit 1
+            fi
+            echo "Verified client mod '$expected': $match"
+            echo "${expected}_jar=${match}" >> "$GITHUB_OUTPUT"
+          done
+
+          {
+            echo "jar_count=$jar_count"
+            echo "sha256=$(sha256sum "$zip_path" | awk '{print $1}')"
+            echo "bytes=$(stat -c %s "$zip_path")"
+          } >> "$GITHUB_OUTPUT"
+
           echo "Client archive SHA-256:"
-          sha256sum build/minecraft-client-1.21.1-fabric.zip
+          sha256sum "$zip_path"
+
+      - name: Report client pack resolution
+        id: report
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          CLIENT_BUILD_OUTCOME: ${{ steps.client_build.outcome }}
+          VERIFY_OUTCOME: ${{ steps.verify_zip.outcome }}
+          JAR_COUNT: ${{ steps.verify_zip.outputs.jar_count || '' }}
+          ZIP_SHA256: ${{ steps.verify_zip.outputs.sha256 || '' }}
+          SODIUM_JAR: ${{ steps.verify_zip.outputs.sodium_jar || '' }}
+          CHIPPED_JAR: ${{ steps.verify_zip.outputs.chipped_jar || '' }}
+          HANDCRAFTED_JAR: ${{ steps.verify_zip.outputs.handcrafted_jar || '' }}
+          JADE_JAR: ${{ steps.verify_zip.outputs.jade_jar || '' }}
+        run: |
+          set -uo pipefail
+
+          log="build/build-client.log"
+          expected_entries="$(grep -Ec '[^[:space:]]' modpack/mods.txt || true)"
+
+          top_level=""
+          resolved_projects=""
+          if [ -s "$log" ]; then
+            top_level="$(sed -n 's/^Top-level manifest entries: //p' "$log" | tail -1)"
+            resolved_projects="$(sed -n 's/^Resolved Modrinth projects (including required dependencies): //p' "$log" | tail -1)"
+            if [ -n "$top_level" ] && [ "$top_level" != "$expected_entries" ]; then
+              echo "::warning::Resolver reported $top_level top-level entries but modpack/mods.txt has $expected_entries."
+            fi
+          fi
+
+          report="$RUNNER_TEMP/client-build-report.md"
+          {
+            echo "## Client modpack build report"
+            echo ""
+            echo "- Client build step: \`${CLIENT_BUILD_OUTCOME:-unknown}\`"
+            echo "- ZIP verification step: \`${VERIFY_OUTCOME:-unknown}\`"
+            echo "- Manifest entries: \`${expected_entries}\` (expected 84 across 16 new mods)"
+            echo "- Resolver top-level entries: \`${top_level:-n/a}\`"
+            echo "- Resolved Modrinth projects (incl. required deps): \`${resolved_projects:-n/a}\`"
+            echo "- Client JARs inside the ZIP: \`${JAR_COUNT:-n/a}\`"
+            echo "- ZIP SHA-256: \`${ZIP_SHA256:-n/a}\`"
+            echo ""
+            echo "Newest mods verified inside the client ZIP:"
+            echo ""
+            echo "- sodium: \`${SODIUM_JAR:-not verified}\`"
+            echo "- chipped: \`${CHIPPED_JAR:-not verified}\`"
+            echo "- handcrafted: \`${HANDCRAFTED_JAR:-not verified}\`"
+            echo "- jade: \`${JADE_JAR:-not verified}\`"
+            echo ""
+          } > "$report"
+
+          if [ -s "$log" ]; then
+            {
+              echo "<details><summary>Modrinth resolution (manifest + required dependencies)</summary>"
+              echo ""
+              echo '```'
+              sed -n '/^Resolving /p' "$log" | head -250
+              echo '```'
+              echo ""
+              echo "</details>"
+              echo ""
+            } >> "$report"
+          fi
+
+          if [ -s build/client-archive-contents.txt ]; then
+            {
+              echo "<details><summary>Client ZIP contents</summary>"
+              echo ""
+              echo '```'
+              head -250 build/client-archive-contents.txt
+              echo '```'
+              echo ""
+              echo "</details>"
+              echo ""
+            } >> "$report"
+          fi
+
+          if [ "${CLIENT_BUILD_OUTCOME:-}" != "success" ] || [ "${VERIFY_OUTCOME:-}" != "success" ]; then
+            {
+              echo "### Failure details"
+              echo ""
+              echo '```'
+              sed -n '/::error::/p' "$log" 2>/dev/null | head -40
+              echo '```'
+              echo ""
+              echo "<details><summary>Last 80 log lines</summary>"
+              echo ""
+              echo '```'
+              tail -80 "$log" 2>/dev/null
+              echo '```'
+              echo ""
+              echo "</details>"
+            } >> "$report"
+            echo "::error::Client modpack build or ZIP verification failed; see the build report."
+          else
+            echo "::notice::Client pack OK: ${JAR_COUNT:-?} JARs in the ZIP (84 manifest entries, ${resolved_projects:-?} Modrinth projects). sodium=${SODIUM_JAR:-?}"
+            echo "::notice::Newest mods present in the ZIP: chipped=${CHIPPED_JAR:-?} handcrafted=${HANDCRAFTED_JAR:-?} jade=${JADE_JAR:-?}"
+          fi
+
+          {
+            echo "## Client modpack build report"
+            echo ""
+            echo "- Manifest entries: ${expected_entries} (target 84)"
+            echo "- Resolved Modrinth projects: ${resolved_projects:-n/a}"
+            echo "- Client JARs in the ZIP: ${JAR_COUNT:-n/a}"
+            echo "- Sodium: ${SODIUM_JAR:-not verified}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -n "${PR_NUMBER:-}" ]; then
+            gh pr comment "$PR_NUMBER" --body-file "$report" || \
+              echo "::warning::Could not post the build report as a PR comment."
+          else
+            echo "No pull request number for this run; build report written to the job summary only."
+          fi
 
       - name: Set up Java 21 for Fabric server packaging
         uses: actions/setup-java@v6
@@ -140,5 +292,6 @@ jobs:
           path: |
             modpack/modpack.yml
             modpack/mods.txt
+            build/client-archive-contents.txt
           if-no-files-found: error
           retention-days: 30
