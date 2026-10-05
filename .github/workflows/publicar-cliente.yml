@@ -180,40 +180,93 @@ jobs:
 
           echo "Published release $TAG from build run $BUILD_RUN_ID."
 
-      - name: Verify published release asset
+      - name: Verify published release metadata
+        id: verify
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ steps.build.outputs.tag }}
+          EXPECTED_BYTES: ${{ steps.zip.outputs.bytes }}
+        run: |
+          set -euo pipefail
+
+          gh --version | head -1
+
+          release_json="$(gh api "repos/$GH_REPO/releases/tags/$TAG")"
+          echo "$release_json" | jq '{name, tag_name, html_url, target_commitish, assets: [.assets[] | {name, size, state, content_type}]}'
+
+          asset_json="$(jq -c --arg zip_name "$CLIENT_ZIP_NAME" \
+            '[.assets[] | select(.name == $zip_name)][0] // empty' <<<"$release_json")"
+          if [ -z "$asset_json" ]; then
+            echo "::error::Release $TAG has no asset named $CLIENT_ZIP_NAME"
+            exit 1
+          fi
+
+          asset_name="$(jq -r '.name' <<<"$asset_json")"
+          asset_state="$(jq -r '.state' <<<"$asset_json")"
+          asset_size="$(jq -r '.size' <<<"$asset_json")"
+          asset_download_url="$(jq -r '.browser_download_url' <<<"$asset_json")"
+          release_url="$(jq -r '.html_url' <<<"$release_json")"
+
+          if [ "$asset_state" != "uploaded" ]; then
+            echo "::error::Asset $asset_name is in state '$asset_state' instead of 'uploaded'."
+            exit 1
+          fi
+          if [ "$asset_size" != "$EXPECTED_BYTES" ]; then
+            echo "::error::Published asset size $asset_size does not match the built ZIP size $EXPECTED_BYTES."
+            exit 1
+          fi
+
+          {
+            echo "asset_name=$asset_name"
+            echo "asset_size=$asset_size"
+            echo "asset_download_url=$asset_download_url"
+            echo "release_url=$release_url"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Release verified: $release_url"
+          echo "Asset verified:   $asset_name ($asset_size bytes, state $asset_state)"
+
+      - name: Verify published asset checksum
+        id: checksum
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           TAG: ${{ steps.build.outputs.tag }}
           EXPECTED_SHA256: ${{ steps.zip.outputs.sha256 }}
-          EXPECTED_BYTES: ${{ steps.zip.outputs.bytes }}
         run: |
           set -euo pipefail
 
-          release_json="$(gh release view "$TAG" --json name,tagName,url,assets,isLatest)"
-          echo "$release_json" | jq .
-
-          asset_name="$(echo "$release_json" | jq -r ".assets[] | select(.name == \"$CLIENT_ZIP_NAME\") | .name")"
-          asset_size="$(echo "$release_json" | jq -r ".assets[] | select(.name == \"$CLIENT_ZIP_NAME\") | .size")"
-          asset_url="$(echo "$release_json" | jq -r ".assets[] | select(.name == \"$CLIENT_ZIP_NAME\") | .url")"
-          release_url="$(echo "$release_json" | jq -r '.url')"
-
-          test "$asset_name" = "$CLIENT_ZIP_NAME"
-          test "$asset_size" = "$EXPECTED_BYTES"
-
           gh release download "$TAG" --pattern "$CLIENT_ZIP_NAME" --dir verify
           downloaded_sha256="$(sha256sum "verify/$CLIENT_ZIP_NAME" | awk '{print $1}')"
-          test "$downloaded_sha256" = "$EXPECTED_SHA256"
+          if [ "$downloaded_sha256" != "$EXPECTED_SHA256" ]; then
+            echo "::error::Downloaded asset SHA-256 $downloaded_sha256 does not match the built ZIP SHA-256 $EXPECTED_SHA256."
+            exit 1
+          fi
 
+          echo "sha256=$downloaded_sha256" >> "$GITHUB_OUTPUT"
+          echo "Published asset SHA-256 matches the built client ZIP."
+
+      - name: Publish job summary
+        env:
+          TAG: ${{ steps.build.outputs.tag }}
+          BUILD_RUN_ID: ${{ steps.build.outputs.run_id }}
+          ASSET_NAME: ${{ steps.verify.outputs.asset_name }}
+          ASSET_SIZE: ${{ steps.verify.outputs.asset_size }}
+          ASSET_URL: ${{ steps.verify.outputs.asset_download_url }}
+          RELEASE_URL: ${{ steps.verify.outputs.release_url }}
+          ASSET_SHA256: ${{ steps.checksum.outputs.sha256 }}
+        run: |
+          set -euo pipefail
           {
             echo "## Client release published"
             echo ""
             echo "- Tag: \`$TAG\`"
-            echo "- Release: $release_url"
-            echo "- Asset: \`$CLIENT_ZIP_NAME\` ($asset_size bytes)"
-            echo "- Asset API URL: $asset_url"
-            echo "- SHA-256 verified: \`$downloaded_sha256\`"
+            echo "- Source build run: $BUILD_RUN_ID"
+            echo "- Release: $RELEASE_URL"
+            echo "- Asset: \`$ASSET_NAME\` ($ASSET_SIZE bytes)"
+            echo "- Download: $ASSET_URL"
+            echo "- SHA-256 verified: \`$ASSET_SHA256\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
-          echo "Release verified: $release_url"
-          echo "Asset verified:   $CLIENT_ZIP_NAME ($asset_size bytes, sha256 $downloaded_sha256)"
+          echo "Client release published: $RELEASE_URL"
