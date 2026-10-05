@@ -35,6 +35,9 @@ mkdir -p "$MODS_DIR" "$API_CACHE_DIR"
 
 declare -A RESOLVED_PROJECTS=()
 declare -A RESOLVED_VERSIONS=()
+declare -A PROJECT_SOURCE=()
+declare -A PROJECT_FILES=()
+DOWNLOADED_FILENAME=""
 
 urlencode() {
   jq -nr --arg value "$1" '$value | @uri'
@@ -423,6 +426,7 @@ download_version_file() {
   local downloaded=0
   local jar_file_count=0
 
+  DOWNLOADED_FILENAME=""
   while IFS=$'\x1f' read -r file_url filename sha512 sha1 size; do
     [[ -z "$file_url" || -z "$filename" ]] && continue
     jar_file_count=$((jar_file_count + 1))
@@ -430,6 +434,7 @@ download_version_file() {
 
     if download_file "$file_url" "$filename" "$sha512" "$sha1" "$size"; then
       downloaded=1
+      DOWNLOADED_FILENAME="$filename"
       break
     fi
 
@@ -442,6 +447,7 @@ download_version_file() {
         echo "  -> trying canonical Modrinth CDN URL" >&2
         if download_file "$fallback_url" "$filename" "$sha512" "$sha1" "$size"; then
           downloaded=1
+          DOWNLOADED_FILENAME="$filename"
           break
         fi
       fi
@@ -472,13 +478,25 @@ download_version_file() {
   fi
 }
 
+# A required dependency's pinned version wins over a top-level preference so
+# the archive contains only one version that satisfies the Modrinth graph.
+source_priority() {
+  case "$1" in
+    manifest) echo 1 ;;
+    required-compatible) echo 2 ;;
+    required-exact) echo 3 ;;
+    *) echo 0 ;;
+  esac
+}
+
 process_version() {
   local version_json="$1"
   local display_name="$2"
   local resolution="${3:-dependency}"
+  local source="${4:-required-compatible}"
   local version_id project_id version_number actual_slug
   local dep_project dep_version dep_type dep_json dep_versions selection
-  local selected_resolution rc
+  local selected_resolution rc incoming_priority existing_priority existing_source existing_version existing_file
 
   version_id="$(jq -r '.id // empty' <<<"$version_json")"
   project_id="$(jq -r '.project_id // empty' <<<"$version_json")"
@@ -491,18 +509,40 @@ process_version() {
     return 1
   fi
 
+  incoming_priority="$(source_priority "$source")"
   if [[ -n "${RESOLVED_PROJECTS[$project_id]:-}" ]]; then
-    if [[ "${RESOLVED_PROJECTS[$project_id]}" == "$version_id" ]]; then
+    existing_version="${RESOLVED_PROJECTS[$project_id]}"
+    existing_source="${PROJECT_SOURCE[$project_id]:-manifest}"
+    existing_priority="$(source_priority "$existing_source")"
+
+    if [[ "$existing_version" == "$version_id" ]]; then
+      if (( incoming_priority > existing_priority )); then
+        PROJECT_SOURCE[$project_id]="$source"
+      fi
       return 0
     fi
-    echo "::error::Conflicting required Modrinth versions for project '$actual_slug': ${RESOLVED_PROJECTS[$project_id]} and $version_id ($version_number)." >&2
-    return 1
+
+    if (( incoming_priority > existing_priority )); then
+      echo "::notice::Required Modrinth version $version_number overrides the lower-priority $existing_source selection for '$actual_slug'." >&2
+      existing_file="${PROJECT_FILES[$project_id]:-}"
+      if [[ -n "$existing_file" ]]; then
+        rm -f "$MODS_DIR/$existing_file"
+      fi
+      PROJECT_FILES[$project_id]=""
+    elif (( incoming_priority < existing_priority )); then
+      echo "::notice::Keeping the higher-priority $existing_source version ${existing_version} for '$actual_slug' instead of the lower-priority $source selection $version_id." >&2
+      return 0
+    else
+      echo "::error::Conflicting required Modrinth versions for project '$actual_slug': $existing_version and $version_id ($version_number)." >&2
+      return 1
+    fi
   fi
   if [[ -n "${RESOLVED_VERSIONS[$version_id]:-}" ]]; then
     return 0
   fi
 
   RESOLVED_PROJECTS[$project_id]="$version_id"
+  PROJECT_SOURCE[$project_id]="$source"
   RESOLVED_VERSIONS[$version_id]=1
 
   if [[ "$resolution" == "compatible-pin" ]]; then
@@ -513,6 +553,7 @@ process_version() {
   echo "Resolving $display_name -> $version_number [$version_id]" >&2
 
   download_version_file "$version_json" "$actual_slug" "$version_number" "$version_id" "$project_id"
+  PROJECT_FILES[$project_id]="$DOWNLOADED_FILENAME"
 
   while IFS=$'\x1f' read -r dep_project dep_version dep_type; do
     [[ "$dep_type" == "required" ]] || continue
@@ -528,7 +569,7 @@ process_version() {
           echo "::error::Modrinth dependency version $dep_version belongs to project $actual_dep_project, not the declared project $dep_project." >&2
           return 1
         fi
-        process_version "$dep_json" "required dependency $dep_project" "dependency"
+        process_version "$dep_json" "required dependency $dep_project" "dependency" "required-exact"
       else
         rc=$?
         if [[ "$rc" -ne 4 || -z "$dep_project" ]]; then
@@ -542,7 +583,7 @@ process_version() {
         }
         dep_json="$(jq -c '.version' <<<"$selection")"
         selected_resolution="$(jq -r '.resolution' <<<"$selection")"
-        process_version "$dep_json" "required dependency $dep_project" "$selected_resolution"
+        process_version "$dep_json" "required dependency $dep_project" "$selected_resolution" "required-compatible"
       fi
     elif [[ -n "$dep_project" ]]; then
       dep_versions="$(compatible_versions_for_project "$dep_project")" || return $?
@@ -552,7 +593,7 @@ process_version() {
       }
       dep_json="$(jq -c '.version' <<<"$selection")"
       selected_resolution="$(jq -r '.resolution' <<<"$selection")"
-      process_version "$dep_json" "required dependency $dep_project" "$selected_resolution"
+      process_version "$dep_json" "required dependency $dep_project" "$selected_resolution" "required-compatible"
     else
       echo "::error::A required Modrinth dependency of '$actual_slug' has no project or version id." >&2
       return 1
@@ -591,7 +632,7 @@ resolve_root_mod() {
     echo "::warning::Pinned version '$wanted_version' for '$requested_slug' was not found; the latest compatible listed build will be used." >&2
   fi
 
-  process_version "$version_json" "$requested_slug" "$resolution"
+  process_version "$version_json" "$requested_slug" "$resolution" "manifest"
 }
 
 trim() {
@@ -632,6 +673,7 @@ Generated automatically by GitHub Actions.
 Mod versions are resolved through the Modrinth API for $MC_VERSION and $LOADER.
 Pinned versions are preferred; if a pin is no longer available, the latest compatible listed release is used.
 Required Modrinth dependencies are resolved transitively by their exact version IDs where available.
+When a required dependency conflicts with a top-level version pin, the required compatible version takes precedence.
 EOF
 
 cp "$ROOT_DIR/modpack/modpack.yml" "$CLIENT_DIR/modpack.yml"

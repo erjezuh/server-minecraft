@@ -42,6 +42,9 @@ class FixtureServer(ThreadingHTTPServer):
                 "voicechat.jar",
                 "macaws.jar",
                 "rightclickharvest.jar",
+                "conflict-old.jar",
+                "conflict-new.jar",
+                "owner.jar",
             )
         }
         self.requests: list[str] = []
@@ -163,12 +166,16 @@ class FixtureHandler(BaseHTTPRequestHandler):
                 "macaws-doors": {"id": "macawsDoorsProject", "slug": "macaws-doors"},
                 "rightclickharvest": {"id": "rightClickHarvestProject", "slug": "rightclickharvest"},
                 "right-click-harvest": {"id": "oldRightClickHarvestProject", "slug": "right-click-harvest"},
+                "conflict-lib": {"id": "conflictProject", "slug": "conflict-lib"},
+                "dependency-owner": {"id": "ownerProject", "slug": "dependency-owner"},
                 "rootProject": {"id": "rootProject", "slug": "root-mod"},
                 "fallbackProject": {"id": "fallbackProject", "slug": "fallback-mod"},
                 "aliasProject": {"id": "aliasProject", "slug": "common-storage-lib"},
                 "macawsDoorsProject": {"id": "macawsDoorsProject", "slug": "macaws-doors"},
                 "rightClickHarvestProject": {"id": "rightClickHarvestProject", "slug": "rightclickharvest"},
                 "oldRightClickHarvestProject": {"id": "oldRightClickHarvestProject", "slug": "right-click-harvest"},
+                "conflictProject": {"id": "conflictProject", "slug": "conflict-lib"},
+                "ownerProject": {"id": "ownerProject", "slug": "dependency-owner"},
             }.get(identifier)
             if project:
                 self.send_json(project)
@@ -197,7 +204,15 @@ class FixtureHandler(BaseHTTPRequestHandler):
                 version_number="2.5.0",
                 filename="voicechat.jar",
             )
-            if version_id == "dep-v1":
+            conflict_dependency = self.fixture.version(
+                version_id="lib-new",
+                project_id="conflictProject",
+                version_number="2.0.0",
+                filename="conflict-new.jar",
+            )
+            if version_id == "lib-new":
+                self.send_json(conflict_dependency)
+            elif version_id == "dep-v1":
                 self.send_json(dependency)
             elif version_id == "voice-v1":
                 self.send_json(voicechat)
@@ -235,6 +250,31 @@ class FixtureHandler(BaseHTTPRequestHandler):
                 direct_file=f"{self.fixture.origin}/files/missing-root.jar",
             )
             return [root]
+        if project_id == "conflictProject":
+            return [
+                self.fixture.version(
+                    version_id="lib-old",
+                    project_id=project_id,
+                    version_number="1.0.0",
+                    filename="conflict-old.jar",
+                )
+            ]
+        if project_id == "ownerProject":
+            return [
+                self.fixture.version(
+                    version_id="owner-v1",
+                    project_id=project_id,
+                    version_number="1.0.0",
+                    filename="owner.jar",
+                    dependencies=[
+                        {
+                            "project_id": "conflictProject",
+                            "version_id": "lib-new",
+                            "dependency_type": "required",
+                        }
+                    ],
+                )
+            ]
         if project_id == "fallbackProject":
             return [
                 self.fixture.version(
@@ -309,7 +349,9 @@ def main() -> None:
             "fallback-mod|99.99.99\n"
             "common-storage-library|0.0.10\n"
             "mcw-doors|1.1.2\n"
-            "right-click-harvest|1.0.0-1.21.x\n",
+            "right-click-harvest|1.0.0-1.21.x\n"
+            "conflict-lib|1.0.0\n"
+            "dependency-owner|1.0.0\n",
             encoding="utf-8",
         )
 
@@ -353,12 +395,16 @@ def main() -> None:
                 "mods/voicechat.jar",
                 "mods/macaws.jar",
                 "mods/rightclickharvest.jar",
+                "mods/conflict-new.jar",
+                "mods/owner.jar",
                 "README.txt",
                 "modpack.yml",
             }
             missing = expected - names
             if missing:
                 raise SystemExit(f"Client ZIP is missing expected entries: {sorted(missing)}")
+            if "mods/conflict-old.jar" in names:
+                raise SystemExit("The lower-priority root pin was not replaced by the required dependency version")
             if "mods/optional.jar" in names:
                 raise SystemExit("Optional dependencies must not be added as required mods")
             if "2.1.0" not in result.stderr:
