@@ -41,6 +41,7 @@ class FixtureServer(ThreadingHTTPServer):
                 "transitive.jar",
                 "voicechat.jar",
                 "macaws.jar",
+                "rightclickharvest.jar",
             )
         }
         self.requests: list[str] = []
@@ -159,9 +160,15 @@ class FixtureHandler(BaseHTTPRequestHandler):
                 "root-mod": {"id": "rootProject", "slug": "root-mod"},
                 "fallback-mod": {"id": "fallbackProject", "slug": "fallback-mod"},
                 "common-storage-lib": {"id": "aliasProject", "slug": "common-storage-lib"},
+                "macaws-doors": {"id": "macawsDoorsProject", "slug": "macaws-doors"},
+                "rightclickharvest": {"id": "rightClickHarvestProject", "slug": "rightclickharvest"},
+                "right-click-harvest": {"id": "oldRightClickHarvestProject", "slug": "right-click-harvest"},
                 "rootProject": {"id": "rootProject", "slug": "root-mod"},
                 "fallbackProject": {"id": "fallbackProject", "slug": "fallback-mod"},
                 "aliasProject": {"id": "aliasProject", "slug": "common-storage-lib"},
+                "macawsDoorsProject": {"id": "macawsDoorsProject", "slug": "macaws-doors"},
+                "rightClickHarvestProject": {"id": "rightClickHarvestProject", "slug": "rightclickharvest"},
+                "oldRightClickHarvestProject": {"id": "oldRightClickHarvestProject", "slug": "right-click-harvest"},
             }.get(identifier)
             if project:
                 self.send_json(project)
@@ -254,6 +261,33 @@ class FixtureHandler(BaseHTTPRequestHandler):
                     filename="alias.jar",
                 )
             ]
+        if project_id == "macawsDoorsProject":
+            return [
+                self.fixture.version(
+                    version_id="macaws-v1",
+                    project_id=project_id,
+                    version_number="1.1.2",
+                    filename="macaws.jar",
+                )
+            ]
+        if project_id == "rightClickHarvestProject":
+            return [
+                self.fixture.version(
+                    version_id="rch-v1",
+                    project_id=project_id,
+                    version_number="4.6.1+1.21.1",
+                    filename="rightclickharvest.jar",
+                    dependencies=[
+                        {
+                            "project_id": "nestedProject",
+                            "version_id": None,
+                            "dependency_type": "required",
+                        }
+                    ],
+                )
+            ]
+        if project_id == "oldRightClickHarvestProject":
+            return []
         if project_id == "nestedProject":
             return [
                 self.fixture.version(
@@ -273,7 +307,9 @@ def main() -> None:
         manifest.write_text(
             "root-mod|1.21.1-Fabric-3.4.0\n"
             "fallback-mod|99.99.99\n"
-            "common-storage-library|0.0.10\n",
+            "common-storage-library|0.0.10\n"
+            "mcw-doors|1.1.2\n"
+            "right-click-harvest|1.0.0-1.21.x\n",
             encoding="utf-8",
         )
 
@@ -315,6 +351,8 @@ def main() -> None:
                 "mods/dependency.jar",
                 "mods/transitive.jar",
                 "mods/voicechat.jar",
+                "mods/macaws.jar",
+                "mods/rightclickharvest.jar",
                 "README.txt",
                 "modpack.yml",
             }
@@ -327,9 +365,13 @@ def main() -> None:
                 raise SystemExit("Unavailable pinned version did not fall back to a compatible release")
             if not any("/cdn/data/rootProject/versions/root-v1/root.jar" in req for req in server.requests):
                 raise SystemExit("Canonical CDN fallback was not attempted after the file URL failed")
+            if any("/v2/project/right-click-harvest" in req for req in server.requests):
+                raise SystemExit("A known stale project slug was tried before its canonical alias")
+            if "4.6.1+1.21.1" not in result.stderr:
+                raise SystemExit("RightClickHarvest did not fall back to its compatible release")
 
-            print("Offline Modrinth integration test passed: version matching, compatible fallback,")
-            print("slug aliases, transitive required dependencies, file verification, and ZIP creation.")
+            print("Offline Modrinth integration test passed: pin matching, compatible fallback,")
+            print("slug aliases, transitive dependencies, verified downloads, and ZIP creation.")
         finally:
             server.shutdown()
             server.server_close()

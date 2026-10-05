@@ -51,6 +51,7 @@ modrinth_slug() {
     betterfortresses) echo "yungs-better-nether-fortresses" ;;
     bettermineshafts) echo "yungs-better-mineshafts" ;;
     betterstrongholds) echo "yungs-better-strongholds" ;;
+    right-click-harvest) echo "rightclickharvest" ;;
     mcw-*) echo "macaws-${1#mcw-}" ;;
     *) echo "$1" ;;
   esac
@@ -112,10 +113,10 @@ project_json_for_slug() {
   declare -A tried=()
 
   alias_slug="$(modrinth_slug "$requested_slug")"
-  candidates+=("$requested_slug")
   if [[ "$alias_slug" != "$requested_slug" ]]; then
     candidates+=("$alias_slug")
   fi
+  candidates+=("$requested_slug")
 
   for candidate in "${candidates[@]}"; do
     [[ -n "${tried[$candidate]:-}" ]] && continue
@@ -504,9 +505,7 @@ process_version() {
   RESOLVED_PROJECTS[$project_id]="$version_id"
   RESOLVED_VERSIONS[$version_id]=1
 
-  if [[ "$resolution" == "latest-compatible" || "$resolution" == "latest-compatible-prerelease" ]]; then
-    echo "::warning::Pinned version for '$display_name' was unavailable for Minecraft $MC_VERSION/$LOADER; using compatible Modrinth version $version_number ($resolution)." >&2
-  elif [[ "$resolution" == "compatible-pin" ]]; then
+  if [[ "$resolution" == "compatible-pin" ]]; then
     echo "::notice::Matched '$display_name' pin to Modrinth version $version_number by its mod-version component." >&2
   elif [[ "$resolution" == "normalized" ]]; then
     echo "::notice::Matched '$display_name' pin to equivalent Modrinth version $version_number after normalizing version separators/case." >&2
