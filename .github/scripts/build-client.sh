@@ -17,6 +17,10 @@ modrinth_slug() {
   case "$1" in
     worldweaver) echo "world-weaver" ;;
     common-storage-library) echo "common-storage" ;;
+    better-dungeons) echo "yungs-better-dungeons" ;;
+    betterfortresses) echo "yungs-better-nether-fortresses" ;;
+    bettermineshafts) echo "yungs-better-mineshafts" ;;
+    betterstrongholds) echo "yungs-better-strongholds" ;;
     *) echo "$1" ;;
   esac
 }
@@ -63,7 +67,7 @@ resolve_mod() {
   echo "  -> $filename"
   curl -fL --retry 3 --retry-all-errors "$primary" -o "build/client/mods/$filename"
 
-  while IFS=$'\t' read -r dep_project dep_version dep_type; do
+  while IFS=$'	' read -r dep_project dep_version dep_type; do
     [[ -z "$dep_project" || "$dep_type" != "required" ]] && continue
     [[ -z "$dep_version" || "$dep_version" == "null" ]] && continue
 
@@ -79,7 +83,7 @@ while IFS='|' read -r slug version; do
     continue
   fi
   case "$slug" in
-    \#*) continue ;;
+    #*) continue ;;
   esac
   resolve_mod "$slug" "$version"
 done < modpack/mods.txt
