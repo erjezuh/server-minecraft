@@ -40,11 +40,6 @@ resolve_mod() {
     ' <<<"$versions_json")"
 
     if [[ -z "$version_id" ]]; then
-      # Treat the pinned value as the base semantic version. Modrinth often
-      # decorates it with loader/MC suffixes, e.g. 1.8.0-fabric-21.1.
-      # Select the unique release whose version begins with that base and is
-      # followed by a separator, preferring the first listed release if
-      # multiple release builds share the same base.
       version_id="$(jq -r --arg v "$wanted_version" '
         ($v | split("+")[0]) as $base
         | [
@@ -81,60 +76,11 @@ resolve_mod() {
   version_number="$(jq -r '.version_number' <<<"$version_json")"
   echo "Resolving $slug @ ${wanted_version:-latest} -> $version_number"
 
-  local primary filename
-  primary="$(jq -r '[.files[] | select(.primary == true)][0].url // .files[0].url // empty' <<<"$version_json")"
-  filename="$(jq -r '[.files[] | select(.primary == true)][0].filename // .files[0].filename // empty' <<<"$version_json")"
-  [[ -n "$primary" && -n "$filename" ]] || {
-    echo "::error::No downloadable file for $slug @ $version_number"
-    return 1
-  }
-
-  echo "  -> $filename"
   local downloaded=0
-  while IFS=
+  local filename=""
+  echo "  -> downloading available Modrinth file"
 
-  while IFS=$'\t' read -r dep_project dep_version dep_type; do
-    [[ -z "$dep_project" || "$dep_type" != "required" ]] && continue
-    [[ -z "$dep_version" || "$dep_version" == "null" ]] && continue
-    local dep_slug dep_ver
-    dep_slug="$(curl -fsSL --retry 3 --retry-all-errors "https://api.modrinth.com/v2/project/$dep_project" | jq -r '.slug')"
-    dep_ver="$(curl -fsSL --retry 3 --retry-all-errors "https://api.modrinth.com/v2/version/$dep_version" | jq -r '.version_number')"
-    resolve_mod "$dep_slug" "$dep_ver"
-  done < <(jq -r '.dependencies[]? | [.project_id // "", .version_id // "", .dependency_type // ""] | @tsv' <<<"$version_json")
-}
-
-while IFS='|' read -r slug version; do
-  [[ -z "$slug" ]] && continue
-  case "$slug" in
-    #*) continue ;;
-  esac
-  resolve_mod "$slug" "$version"
-done < modpack/mods.txt
-
-find build/client/mods -type f -iname 'voicechat-*.jar' -delete
-
-count="$(find build/client/mods -maxdepth 1 -type f -name '*.jar' | wc -l)"
-echo "Client JAR count: $count"
-test "$count" -gt 0
-
-cat > build/client/README.txt <<EOF
-Minecraft 1.21.1 Fabric $LOADER_VERSION
-Generated automatically by GitHub Actions.
-Mod versions are resolved through the Modrinth API.
-Pinned versions use exact matches when available, otherwise compatible release metadata.
-Required dependencies use their exact Modrinth version IDs.
-Voice Chat is intentionally excluded.
-EOF
-
-cp modpack/modpack.yml build/client/modpack.yml
-
-(
-  cd build/client
-  zip -qr ../minecraft-client-1.21.1-fabric.zip .
-)
-
-ls -lh build/minecraft-client-1.21.1-fabric.zip
-\t' read -r file_url file_name; do
+  while IFS=$'\t' read -r file_url file_name; do
     [[ -z "$file_url" || -z "$file_name" ]] && continue
     echo "  -> trying $file_name"
     if curl -fL --retry 2 --retry-delay 1 "$file_url" -o "build/client/mods/$file_name"; then
@@ -176,9 +122,6 @@ ls -lh build/minecraft-client-1.21.1-fabric.zip
 
 while IFS='|' read -r slug version; do
   [[ -z "$slug" ]] && continue
-  case "$slug" in
-    #*) continue ;;
-  esac
   resolve_mod "$slug" "$version"
 done < modpack/mods.txt
 
