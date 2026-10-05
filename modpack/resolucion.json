@@ -1,0 +1,463 @@
+{
+  "minecraft": "1.21.1",
+  "loader": "fabric",
+  "mods": {
+    "fabric-api": {
+      "lado": "ambos",
+      "version_id": "Mys3P7lK",
+      "numero": "0.116.17+1.21.1"
+    },
+    "cloth-config": {
+      "lado": "ambos",
+      "version_id": "HpMb5wGb",
+      "numero": "15.0.140+fabric"
+    },
+    "balm": {
+      "lado": "ambos",
+      "version_id": "EghJxg4h",
+      "numero": "21.0.66+fabric-1.21.1"
+    },
+    "moonlight": {
+      "lado": "ambos",
+      "version_id": "FrIMIBv6",
+      "numero": "1.21.1-3.7.0"
+    },
+    "yungs-api": {
+      "lado": "ambos",
+      "version_id": "9rzwORd6",
+      "numero": "1.21.1-Fabric-5.1.9"
+    },
+    "cristel-lib": {
+      "lado": "servidor",
+      "version_id": "K1dyr5gj",
+      "numero": "fabric-1.21.1-3.1.7"
+    },
+    "libz": {
+      "lado": "ambos",
+      "version_id": "tvtFvW21",
+      "numero": "1.1.0+1.21.1"
+    },
+    "worldweaver": {
+      "lado": "ambos",
+      "version_id": "mPmeykPR",
+      "numero": "21.0.13"
+    },
+    "lithostitched": {
+      "lado": "servidor",
+      "version_id": "eN30OQaU",
+      "numero": "1.8.0-fabric-21.1"
+    },
+    "yacl": {
+      "lado": "cliente",
+      "version_id": "o3cDn8Vp",
+      "numero": "3.8.2+1.21.1-fabric"
+    },
+    "bundle-api": {
+      "lado": "ambos",
+      "version_id": "b87XqtPa",
+      "numero": "1.1.0-fabric"
+    },
+    "fabric-language-kotlin": {
+      "lado": "servidor",
+      "version_id": "eRRZzGMc",
+      "numero": "1.14.1+kotlin.2.4.20"
+    },
+    "forge-config-api-port": {
+      "lado": "servidor",
+      "version_id": "N5qzq0XV",
+      "numero": "v21.1.6-1.21.1-Fabric"
+    },
+    "puzzles-lib": {
+      "lado": "servidor",
+      "version_id": "k2VtZBAO",
+      "numero": "21.1.62"
+    },
+    "placeholder-api": {
+      "lado": "cliente",
+      "version_id": "U5bhVym2",
+      "numero": "2.4.2+1.21"
+    },
+    "fzzy-config": {
+      "lado": "ambos",
+      "version_id": "zFccjYag",
+      "numero": "0.7.7+1.21"
+    },
+    "bclib": {
+      "lado": "ambos",
+      "version_id": "TxWM7AW8",
+      "numero": "21.0.13"
+    },
+    "reborncore": {
+      "lado": "ambos",
+      "version_id": "QtkC5plA",
+      "numero": "5.11.19"
+    },
+    "spell-engine": {
+      "lado": "ambos",
+      "version_id": "PITgFMUu",
+      "numero": "1.10.9+1.21.1-fabric"
+    },
+    "runes": {
+      "lado": "ambos",
+      "version_id": "MUfjgRc2",
+      "numero": "1.3.2+1.21.1-fabric"
+    },
+    "spell-power": {
+      "lado": "ambos",
+      "version_id": "IyVyrKj8",
+      "numero": "1.6.0+1.21.1-fabric"
+    },
+    "armor-model-api": {
+      "lado": "ambos",
+      "version_id": "eqjiejBH",
+      "numero": "1.1.0+1.21.1-fabric"
+    },
+    "structure-pool-api": {
+      "lado": "ambos",
+      "version_id": "Y6aBoKEl",
+      "numero": "1.2.1+1.21.1-fabric"
+    },
+    "ranged-weapon-api": {
+      "lado": "ambos",
+      "version_id": "D23XVjUe",
+      "numero": "3.0.0+1.21.1-fabric"
+    },
+    "trinkets": {
+      "lado": "ambos",
+      "version_id": "JagCscwi",
+      "numero": "3.10.0"
+    },
+    "resourceful-lib": {
+      "lado": "ambos",
+      "version_id": "Hf91FuVF",
+      "numero": "3.0.12"
+    },
+    "playeranimator": {
+      "lado": "ambos",
+      "version_id": "CkedfDp3",
+      "numero": "2.0.4+1.21.1-fabric"
+    },
+    "badpackets": {
+      "lado": "cliente",
+      "version_id": "hjhT2sMz",
+      "numero": "fabric-0.8.2"
+    },
+    "polymer": {
+      "lado": "servidor",
+      "version_id": "xqZ9fctS",
+      "numero": "0.9.19+1.21.1"
+    },
+    "lithium": {
+      "lado": "ambos",
+      "version_id": "N08Z8wog",
+      "numero": "mc1.21.1-0.15.4-fabric"
+    },
+    "krypton": {
+      "lado": "ambos",
+      "version_id": "Acz3ttTp",
+      "numero": "0.2.8"
+    },
+    "ferrite-core": {
+      "lado": "ambos",
+      "version_id": "sOzRw3CG",
+      "numero": "7.0.3-fabric"
+    },
+    "noisium": {
+      "lado": "servidor",
+      "version_id": "4sGQgiu2",
+      "numero": "2.3.0+mc1.21-1.21.1"
+    },
+    "alternate-current": {
+      "lado": "servidor",
+      "version_id": "78P98rac",
+      "numero": "mc1.21-1.9.0"
+    },
+    "sodium": {
+      "lado": "cliente",
+      "version_id": "SMxNOGZ6",
+      "numero": "mc1.21.1-0.8.13-fabric"
+    },
+    "indium": {
+      "lado": "cliente",
+      "version_id": "Z8VpxxGh",
+      "numero": "1.0.35+mc1.21"
+    },
+    "sodium-extra": {
+      "lado": "cliente",
+      "version_id": "YEWu6red",
+      "numero": "mc1.21.1-0.9.4+fabric"
+    },
+    "entityculling": {
+      "lado": "cliente",
+      "version_id": "AaC52CuD",
+      "numero": "1.11.2"
+    },
+    "immediatelyfast": {
+      "lado": "cliente",
+      "version_id": "7XKnsIC8",
+      "numero": "1.6.14+1.21.1-fabric"
+    },
+    "moreculling": {
+      "lado": "cliente",
+      "version_id": "wUYbHzXF",
+      "numero": "1.0.10"
+    },
+    "dynamic-fps": {
+      "lado": "cliente",
+      "version_id": "GBH14HiF",
+      "numero": "3.11.4"
+    },
+    "debugify": {
+      "lado": "cliente",
+      "version_id": "pyIdu3f1",
+      "numero": "1.21.1+1.1"
+    },
+    "terralith": {
+      "lado": "servidor",
+      "version_id": "eWDLFabb",
+      "numero": "2.6.2"
+    },
+    "yungs-better-dungeons": {
+      "lado": "servidor",
+      "version_id": "fQ7EjDPE",
+      "numero": "1.21.1-Fabric-5.1.4"
+    },
+    "yungs-better-mineshafts": {
+      "lado": "servidor",
+      "version_id": "4ybDuGhA",
+      "numero": "1.21.1-Fabric-5.1.1"
+    },
+    "yungs-better-strongholds": {
+      "lado": "servidor",
+      "version_id": "uYZShp1p",
+      "numero": "1.21.1-Fabric-5.1.3"
+    },
+    "yungs-better-nether-fortresses": {
+      "lado": "servidor",
+      "version_id": "gxBGYcIL",
+      "numero": "1.21.1-Fabric-3.1.5"
+    },
+    "structory": {
+      "lado": "servidor",
+      "version_id": "TUbwu7eG",
+      "numero": "1.3.17"
+    },
+    "towns-and-towers": {
+      "lado": "servidor",
+      "version_id": "DZxwgj6V",
+      "numero": "1.13.11"
+    },
+    "betterend": {
+      "lado": "ambos",
+      "version_id": "4qhBEg6J",
+      "numero": "21.0.11"
+    },
+    "betternether": {
+      "lado": "ambos",
+      "version_id": "M1o6hR2m",
+      "numero": "21.0.11"
+    },
+    "waystones": {
+      "lado": "ambos",
+      "version_id": "nSAwjAk4",
+      "numero": "21.1.46+fabric-1.21.1"
+    },
+    "natures-compass": {
+      "lado": "ambos",
+      "version_id": "dtrDpgsF",
+      "numero": "1.21.1-2.6.0-fabric"
+    },
+    "xaeros-minimap": {
+      "lado": "cliente",
+      "version_id": "ZD6hK4GV",
+      "numero": "fabric-1.21.1-26.5.0"
+    },
+    "xaeros-world-map": {
+      "lado": "cliente",
+      "version_id": "txl9KURC",
+      "numero": "fabric-1.21.1-1.46.0"
+    },
+    "naturalist": {
+      "lado": "ambos",
+      "version_id": "GkSvbUbs",
+      "numero": "2.0.5+1.21.1-fabric"
+    },
+    "friends-and-foes": {
+      "lado": "ambos",
+      "version_id": "UaBxLkkc",
+      "numero": "fabric-4.0.27+mc1.21.1"
+    },
+    "wizards": {
+      "lado": "ambos",
+      "version_id": "YXyLQF2i",
+      "numero": "3.1.3+1.21.1-fabric"
+    },
+    "archers": {
+      "lado": "ambos",
+      "version_id": "PADcptb0",
+      "numero": "3.1.3+1.21.1-fabric"
+    },
+    "better-combat": {
+      "lado": "ambos",
+      "version_id": "JJQpBecL",
+      "numero": "2.4.0+1.21.1-fabric"
+    },
+    "combat-roll": {
+      "lado": "ambos",
+      "version_id": "UkTSsgGt",
+      "numero": "2.0.6+1.21.1-fabric"
+    },
+    "levelz": {
+      "lado": "ambos",
+      "version_id": "BzDUUS67",
+      "numero": "2.0.11+1.21.1"
+    },
+    "techreborn": {
+      "lado": "ambos",
+      "version_id": "CNwZZ4FD",
+      "numero": "5.11.19"
+    },
+    "supplementaries": {
+      "lado": "ambos",
+      "version_id": "h8FyJ2as",
+      "numero": "1.21.1-3.9.9"
+    },
+    "another-furniture": {
+      "lado": "ambos",
+      "version_id": "8xUs6Teu",
+      "numero": "4.0.2"
+    },
+    "macaws-doors": {
+      "lado": "ambos",
+      "version_id": "Zsfvgzu6",
+      "numero": "1.1.5"
+    },
+    "macaws-windows": {
+      "lado": "ambos",
+      "version_id": "4mvfMpVO",
+      "numero": "2.4.2"
+    },
+    "macaws-roofs": {
+      "lado": "ambos",
+      "version_id": "BgPUaaiV",
+      "numero": "2.3.2"
+    },
+    "farmers-delight-refabricated": {
+      "lado": "ambos",
+      "version_id": "wbVXT4Ua",
+      "numero": "1.21.1-3.3.6"
+    },
+    "appleskin": {
+      "lado": "cliente",
+      "version_id": "b5ZiCjAr",
+      "numero": "3.0.6+mc1.21"
+    },
+    "simple-voice-chat": {
+      "lado": "ambos",
+      "version_id": "VS5X7jZd",
+      "numero": "fabric-1.21.1-2.6.22"
+    },
+    "emotecraft": {
+      "lado": "ambos",
+      "version_id": "daqt5qcK",
+      "numero": "2.4.12+1.21.1-fabric"
+    },
+    "comforts": {
+      "lado": "ambos",
+      "version_id": "LUPOTXbk",
+      "numero": "9.0.5+1.21.1"
+    },
+    "lootr": {
+      "lado": "ambos",
+      "version_id": "nar56EsW",
+      "numero": "1.21.1-1.11.38.127"
+    },
+    "universal-graves": {
+      "lado": "servidor",
+      "version_id": "Fg64B87Y",
+      "numero": "3.4.4+1.21"
+    },
+    "emi": {
+      "lado": "cliente",
+      "version_id": "on5GT1qh",
+      "numero": "1.1.24+1.21.1+fabric"
+    },
+    "emi-loot": {
+      "lado": "ambos",
+      "version_id": "6uDAJNif",
+      "numero": "0.7.9+1.21+fabric"
+    },
+    "wthit": {
+      "lado": "cliente",
+      "version_id": "3TElmFLp",
+      "numero": "fabric-12.10.2"
+    },
+    "shulkerboxtooltip": {
+      "lado": "cliente",
+      "version_id": "NSrItCES",
+      "numero": "5.1.9+1.21.1-fabric"
+    },
+    "mouse-tweaks": {
+      "lado": "cliente",
+      "version_id": "ylmBQ38A",
+      "numero": "1.21-2.26-fabric"
+    },
+    "modmenu": {
+      "lado": "cliente",
+      "version_id": "6lgOkclV",
+      "numero": "11.0.5"
+    },
+    "chat-heads": {
+      "lado": "cliente",
+      "version_id": "5t3tM2L3",
+      "numero": "0.15.7"
+    },
+    "sound-physics-remastered": {
+      "lado": "cliente",
+      "version_id": "m3KTcqdE",
+      "numero": "fabric-1.21.1-1.4.10"
+    },
+    "presence-footsteps": {
+      "lado": "cliente",
+      "version_id": "CrvsDgLW",
+      "numero": "1.11.2+1.21"
+    },
+    "eating-animation": {
+      "lado": "cliente",
+      "version_id": "KWZCioh0",
+      "numero": "1.9.72"
+    },
+    "fallingtree": {
+      "lado": "ambos",
+      "version_id": "wxGXaJMA",
+      "numero": "1.21.1-1.21.1.11"
+    },
+    "simple-harvest": {
+      "lado": "servidor",
+      "version_id": "RjNowLIa",
+      "numero": "1.0.0-1.21.x"
+    },
+    "leaves-be-gone": {
+      "lado": "servidor",
+      "version_id": "hYZEEekT",
+      "numero": "v21.1.1-1.21.1-Fabric"
+    },
+    "chunky": {
+      "lado": "servidor",
+      "version_id": "RVFHfo1D",
+      "numero": "1.4.23"
+    },
+    "spark": {
+      "lado": "servidor",
+      "version_id": "cALUj9l1",
+      "numero": "1.10.109-fabric"
+    },
+    "ledger": {
+      "lado": "servidor",
+      "version_id": "t1AtqfxZ",
+      "numero": "1.3.5"
+    }
+  },
+  "fabric_loader": "0.19.5",
+  "fijado_en": "2026-10-04T21:42:48Z"
+}

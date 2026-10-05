@@ -1,0 +1,102 @@
+name: Construir modpack
+
+# Build del modpack: fija versiones, descarga .jars y genera paquetes.
+# Manual ("Run workflow") + un único auto-disparo al crear este fichero en la
+# rama (los workflow_dispatch nuevos no existen hasta merge a main).
+# Reutiliza el lockfile salvo `actualizar: true`: las versiones NO cambian solas.
+# No despliega nada.
+on:
+  workflow_dispatch:
+    inputs:
+      actualizar:
+        description: "Volver a fijar versiones (true) o reutilizar lockfile (false)"
+        required: false
+        default: "false"
+  push:
+    branches:
+      - "arena/**"
+    paths:
+      - ".github/workflows/construir.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  construir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install script dependencies
+        run: python3 -m pip install -r scripts/requirements.txt
+
+      - name: Fijar versiones (lockfile)
+        run: |
+          if [ "${{ inputs.actualizar }}" = "true" ] || [ ! -f modpack/resolucion.json ]; then
+            python3 scripts/resolver.py --estricto --guardar modpack/resolucion.json --informe build/informe-verificacion.md
+          else
+            echo "Reutilizando lockfile existente (sin re-fijar versiones)."
+            python3 scripts/resolver.py --estricto --informe build/informe-verificacion.md
+          fi
+
+      - name: Descargar y empaquetar
+        run: python3 scripts/construir.py --resolucion modpack/resolucion.json --salida build/
+
+      - name: Registrar fabric-loader en lockfile
+        run: |
+          python3 - <<'EOF'
+          import json, zipfile
+          from datetime import datetime, timezone
+          from pathlib import Path
+          mrpack = next(Path("build").glob("*.mrpack"))
+          with zipfile.ZipFile(mrpack) as z:
+              index = json.loads(z.read("modrinth.index.json"))
+          loader = index["dependencies"]["fabric-loader"]
+          p = Path("modpack/resolucion.json")
+          res = json.loads(p.read_text(encoding="utf-8"))
+          res["fabric_loader"] = loader
+          res.setdefault("fijado_en", datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
+          p.write_text(json.dumps(res, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+          print(f"lockfile: fabric-loader {loader}")
+          EOF
+
+      - name: Verificar build + informe
+        run: python3 scripts/verificar_build.py --resolucion modpack/resolucion.json --salida build/ --informe docs/INFORME_BUILD.md
+
+      - name: Publicar lockfile e informe
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add modpack/resolucion.json docs/INFORME_BUILD.md
+          if git diff --cached --quiet; then
+            echo "Sin cambios que publicar."
+          else
+            git commit -m "[skip ci] Fija resolucion.json + INFORME_BUILD" \
+              -m "Construcción manual: 91 versiones fijadas, paquetes verificados." \
+              -m "Artefactos (.mrpack, servidor.zip) en el run de Actions."
+            git push origin "HEAD:${{ github.ref_name }}"
+          fi
+
+      - name: Subir artefactos
+        uses: actions/upload-artifact@v4
+        with:
+          name: modpack-1.0.0
+          retention-days: 90
+          path: |
+            build/*.mrpack
+            build/servidor.zip
+            modpack/resolucion.json
+            docs/INFORME_BUILD.md

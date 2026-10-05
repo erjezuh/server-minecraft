@@ -1,0 +1,89 @@
+name: Deploy server via SFTP
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: "GitHub Actions run ID containing the approved modpack-1.0.0 artifact"
+        required: true
+        type: string
+      confirm:
+        description: "Type DEPLOY to authorize the upload"
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: deploy-server
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: ${{ inputs.confirm == 'DEPLOY' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Validate required deployment secrets
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_REMOTE_PATH: ${{ secrets.SFTP_REMOTE_PATH }}
+        run: |
+          set -euo pipefail
+          for name in SFTP_HOST SFTP_PORT SFTP_USER SFTP_PASSWORD SFTP_REMOTE_PATH; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing GitHub Secret: $name"
+              exit 1
+            fi
+          done
+          echo "All required SFTP secrets are present."
+
+      - name: Download approved build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: modpack-1.0.0
+          path: artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.build_run_id }}
+
+      - name: Validate server package
+        run: |
+          set -euo pipefail
+          test -f artifact/servidor.zip
+          test -s artifact/servidor.zip
+          unzip -t artifact/servidor.zip >/dev/null
+          echo "servidor.zip is present and is a valid ZIP archive."
+          ls -lh artifact/servidor.zip
+
+      - name: Extract server package
+        run: |
+          set -euo pipefail
+          rm -rf deploy
+          mkdir -p deploy
+          unzip -q artifact/servidor.zip -d deploy
+          test -n "$(find deploy -type f -print -quit)"
+          echo "Prepared deployment payload:"
+          find deploy -type f -printf '%P\n' | sort | head -200
+
+      - name: Upload server files via SFTP
+        uses: wearesection/sftp-action@1.0.4
+        with:
+          host: ${{ secrets.SFTP_HOST }}
+          port: ${{ secrets.SFTP_PORT }}
+          username: ${{ secrets.SFTP_USER }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          localPath: deploy
+          remotePath: ${{ secrets.SFTP_REMOTE_PATH }}
+
+      - name: Deployment summary
+        run: |
+          echo "SFTP upload completed."
+          echo "Remote path: configured through GitHub Secret SFTP_REMOTE_PATH"
+          echo "The workflow did not issue a remote restart or delete remote files."

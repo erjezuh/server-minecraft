@@ -1,31 +1,41 @@
-name: Build Minecraft Server
+name: Verificar modpack
 
+# Valida el manifiesto y verifica cada mod contra Modrinth.
+# NO descarga .jar ni despliega nada.
 on:
   push:
     branches:
       - main
+      - "arena/**"
+  pull_request:
   workflow_dispatch:
 
 jobs:
-  build:
+  verificar:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Show project structure
-        run: |
-          echo "Minecraft server project"
-          find . -maxdepth 3 -type f | sort
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-      - name: Build server
-        run: |
-          mkdir -p build/server
-          cp -r server/. build/server/ 2>/dev/null || true
+      - name: Install script dependencies
+        run: python3 -m pip install -r scripts/requirements.txt
 
-      - name: Upload server artifact
+      - name: Validate manifest schema (offline)
+        run: python3 scripts/resolver.py --solo-esquema
+
+      - name: Verify mods against Modrinth (no downloads)
+        run: python3 scripts/resolver.py --estricto --informe build/informe-verificacion.md
+
+      - name: Upload verification report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: minecraft-server
-          path: build/server
+          name: informe-verificacion
+          path: |
+            build/informe-verificacion.md
+            modpack/modpack.yml
