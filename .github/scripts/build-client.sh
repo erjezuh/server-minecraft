@@ -72,7 +72,7 @@ resolve_mod() {
 }
 
 while IFS='|' read -r slug version; do
-  [[ -z "$slug" || "$slug" == #* ]] && continue
+  [[ -z "$slug" || "$slug" == \#* ]] && continue
   resolve_mod "$slug" "$version"
 done < modpack/mods.txt
 
