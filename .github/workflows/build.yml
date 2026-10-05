@@ -26,19 +26,12 @@ jobs:
           echo "Minecraft server project"
           find . -maxdepth 3 -type f | sort
 
-      - name: Prepare server package
-        run: |
-          set -euo pipefail
-          rm -rf build
-          mkdir -p build/server
-          cp -r server/. build/server/ 2>/dev/null || true
-
       - name: Validate client build tools
         run: |
           set -euo pipefail
           for tool in bash curl jq zip unzip sha256sum sha1sum sha512sum python3; do
             command -v "$tool" >/dev/null || {
-              echo "::error::Required client build tool is missing: $tool"
+              echo "::error::Required build tool is missing: $tool"
               exit 1
             }
           done
@@ -61,11 +54,75 @@ jobs:
           echo "Client archive SHA-256:"
           sha256sum build/minecraft-client-1.21.1-fabric.zip
 
+      - name: Set up Java 21 for Fabric server packaging
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Build Fabric server package
+        env:
+          MC_VERSION: '1.21.1'
+          LOADER_VERSION: '0.19.5'
+        run: |
+          set -euo pipefail
+
+          rm -rf build/server
+          mkdir -p build/server/payload build/server/tmp
+
+          java -version
+
+          FABRIC_INSTALLER_VERSION="$(
+            curl               --fail --location --silent --show-error               --retry 4 --retry-delay 1 --retry-max-time 60               --connect-timeout 20 --max-time 120               https://meta.fabricmc.net/v2/versions/installer |
+              jq -r '[.[] | select(.stable == true)][0].version'
+          )"
+
+          test -n "$FABRIC_INSTALLER_VERSION"
+          test "$FABRIC_INSTALLER_VERSION" != "null"
+          echo "Using Fabric installer $FABRIC_INSTALLER_VERSION"
+
+          curl             --fail --location --silent --show-error             --retry 4 --retry-delay 1 --retry-max-time 60             --connect-timeout 20 --max-time 300             "https://maven.fabricmc.net/net/fabricmc/fabric-installer/$FABRIC_INSTALLER_VERSION/fabric-installer-$FABRIC_INSTALLER_VERSION.jar"             -o build/server/tmp/fabric-installer.jar
+
+          java -jar build/server/tmp/fabric-installer.jar server             -dir build/server/payload             -mcversion "$MC_VERSION"             -loader "$LOADER_VERSION"             -downloadMinecraft
+
+          mkdir -p build/server/payload/mods
+          cp build/client/mods/*.jar build/server/payload/mods/
+          cp modpack/modpack.yml build/server/payload/modpack.yml
+
+          cat > build/server/payload/README.txt <<EOF
+          Minecraft $MC_VERSION Fabric $LOADER_VERSION server
+          Generated automatically by GitHub Actions.
+          The server uses the same resolved Modrinth mod set as the client pack.
+          Java 21 is required for Minecraft $MC_VERSION.
+          EOF
+
+          test -s build/server/payload/fabric-server-launch.jar
+          test -s build/server/payload/server.jar
+          test -s build/server/payload/mods/fabric-api-*.jar
+
+          server_mod_count="$(find build/server/payload/mods -maxdepth 1 -type f -iname '*.jar' | wc -l | tr -d '[:space:]')"
+          echo "Server JAR count: $server_mod_count"
+          test "$server_mod_count" -gt 0
+
+          (
+            cd build/server/payload
+            zip -qr ../servidor.zip .
+          )
+
+          test -s build/server/servidor.zip
+          unzip -tq build/server/servidor.zip
+          echo "Server archive SHA-256:"
+          sha256sum build/server/servidor.zip
+
+          rm -rf build/server/payload build/server/tmp
+
       - name: Upload server artifact
         uses: actions/upload-artifact@v4
         with:
           name: minecraft-server
-          path: build/server
+          path: build/server/servidor.zip
+          if-no-files-found: error
+          compression-level: 0
           retention-days: 30
 
       - name: Upload client ZIP
@@ -83,4 +140,5 @@ jobs:
           path: |
             modpack/modpack.yml
             modpack/mods.txt
+          if-no-files-found: error
           retention-days: 30
