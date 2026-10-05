@@ -2,7 +2,6 @@ alternate-current|1.9.0
 another-furniture|4.0.2
 appleskin|3.0.6+mc1.21
 archers|3.1.3+1.21.1
-architectury-api|
 armor-model-api|1.1.0+1.21.1
 balm|21.0.66
 bclib|21.0.13
@@ -36,7 +35,6 @@ friends-and-foes|4.0.27
 fzzy-config|0.7.7+1.21
 handcrafted|
 immediatelyfast|1.6.14+1.21.1-fabric
-indium|1.0.35+mc1.21
 jade|
 krypton|0.2.8
 leaves-be-gone|21.1.1
@@ -56,6 +54,7 @@ natures-compass|1.21.1-2.6.0-fabric
 noisium|2.3.0+mc1.21-1.21.1
 playeranimator|2.0.4+1.21.1
 polymer|0.9.19+1.21.1
+presence-footsteps|1.11.2+1.21
 puzzles-lib|21.1.62
 ranged-weapon-api|3.0.0+1.21.1
 reborncore|5.11.19
@@ -65,6 +64,7 @@ runes|1.3.2+1.21.1
 simple-voice-chat|fabric-1.21.1-2.6.22
 sodium-extra|mc1.21.1-0.9.4+fabric
 sodium|mc1.21.1-0.8.13-fabric
+sound-physics-remastered|fabric-1.21.1-1.4.10
 spark|1.10.109
 spell-engine|1.10.9+1.21.1
 spell-power|1.6.0+1.21.1

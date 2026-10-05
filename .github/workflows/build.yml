@@ -205,6 +205,30 @@ jobs:
             } >> "$report"
           done
 
+          # Identify the projects behind dependency ids the resolver pulled in
+          # transitively (Modrinth only exposes those as project ids).
+          dep_ids="$(sed -n 's/^Resolving required dependency \([A-Za-z0-9]*\) ->.*/\1/p' "$log" 2>/dev/null | sort -u | head -20)"
+          if [ -n "$dep_ids" ]; then
+            {
+              echo ""
+              echo "<details><summary>Required dependencies resolved transitively (project ids)</summary>"
+              echo ""
+              echo "| Project id | Project | Slug |"
+              echo "| --- | --- | --- |"
+            } >> "$report"
+            while read -r dep_id; do
+              if [ -z "$dep_id" ]; then
+                continue
+              fi
+              dep_json="$(curl -fsSL -A "$API_USER_AGENT" "$MODRINTH_API_BASE_URL/project/$dep_id" 2>/dev/null || echo '{}')"
+              echo "| \`$dep_id\` | $(jq -r '.title // "unknown"' <<<"$dep_json") | \`$(jq -r '.slug // "?"' <<<"$dep_json")\` |" >> "$report"
+            done <<< "$dep_ids"
+            {
+              echo ""
+              echo "</details>"
+            } >> "$report"
+          fi
+
           if [ "${CLIENT_BUILD_OUTCOME:-}" != "success" ] || [ "${VERIFY_OUTCOME:-}" != "success" ]; then
             {
               echo "### Failure details"
