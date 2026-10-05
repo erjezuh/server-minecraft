@@ -11,7 +11,7 @@ command -v zip >/dev/null
 
 rm -rf build/client
 mkdir -p build/client/mods
-declare -A SEEN_PROJECTS=()
+declare -A SEEN_VERSIONS=()
 
 modrinth_slug() {
   case "$1" in
@@ -28,40 +28,71 @@ modrinth_slug() {
 
 resolve_mod() {
   local slug="$(modrinth_slug "$1")"
-  local wanted_version="$2"
-
-  if [[ -n "${SEEN_PROJECTS[$slug]:-}" ]]; then
-    return 0
-  fi
-  SEEN_PROJECTS[$slug]=1
-
-  echo "Resolving $slug @ $wanted_version"
-
+  local wanted_version="${2:-}"
   local versions_json
-  versions_json="$(curl -fsSL --retry 3 --retry-all-errors "https://api.modrinth.com/v2/project/$slug/version?game_versions=%5B%22$MC_VERSION%22%5D&loaders=%5B%22$LOADER%22%5D")"
+  versions_json="$(curl -fsSL --retry 3 --retry-all-errors "https://api.modrinth.com/v2/project/$slug/version?game_versions=%5B%22$MC_VERSION%22%5D&loaders=%5B%22$LOADER%22%5D&include_changelog=false")"
 
-  local version_id
-  version_id="$(jq -r --arg v "$wanted_version" '[.[] | select(.version_number == $v)][0].id // empty' <<<"$versions_json")"
+  local version_id version_number
+  if [[ -n "$wanted_version" ]]; then
+    version_id="$(jq -r --arg v "$wanted_version" '
+      [.[] | select(.version_number == $v or (.version_number | ltrimstr("v")) == $v)]
+      | if length == 1 then .[0].id else empty end
+    ' <<<"$versions_json")"
 
-  if [[ -z "$version_id" ]]; then
-    version_id="$(jq -r --arg v "$wanted_version" '($v | split("+")[0]) as $base | [.[] | (.version_number | ltrimstr("v")) as $n | select($n == $v or ($n | startswith($v + "-")) or ($n | startswith($v + "+")) or ($n | endswith("-" + $v)) or ($n | endswith("+" + $v)) or ($n | test("(^|[^0-9])" + $base + "([^0-9]|$)")))] | if length == 1 then .[0].id else empty end' <<<"$versions_json")"
+    if [[ -z "$version_id" ]]; then
+      version_id="$(jq -r --arg v "$wanted_version" '
+        ($v | split("+")[0]) as $base
+        | [.[] | select(
+            ((.version_number | ltrimstr("v")) == $base)
+            or ((.version_number | ltrimstr("v")) | startswith($base + "-"))
+            or ((.version_number | ltrimstr("v")) | startswith($base + "+"))
+          )]
+        | if (length == 1) then .[0].id
+          else (map(select(.version_type == "release")) | if length == 1 then .[0].id else empty end)
+          end
+      ' <<<"$versions_json")"
+    fi
+
+    if [[ -z "$version_id" ]]; then
+      version_id="$(jq -r --arg v "$wanted_version" '
+        ($v | split("+")[0]) as $base
+        | [.[] | select(
+            (.version_number | ltrimstr("v")) == $base
+            or ((.version_number | ltrimstr("v")) | contains($base))
+          )]
+        | if (length == 1) then .[0].id
+          else (map(select(.version_type == "release")) | if length == 1 then .[0].id else empty end)
+          end
+      ' <<<"$versions_json")"
+    fi
+  else
+    version_id="$(jq -r '
+      [.[] | select(.status == "listed" and .version_type == "release")]
+      | .[0].id // empty
+    ' <<<"$versions_json")"
   fi
 
   if [[ -z "$version_id" ]]; then
-    echo "::error::Could not resolve exact Modrinth version: $slug @ $wanted_version"
-    jq -r '.[0:10][] | "  " + .version_number + " (" + .id + ")"' <<<"$versions_json" || true
+    echo "::error::Could not resolve compatible Modrinth version: $slug @ ${wanted_version:-latest}"
+    jq -r '.[0:12][] | "  " + .version_number + " [" + .version_type + "] (" + .id + ")"' <<<"$versions_json" || true
     return 1
   fi
 
+  if [[ -n "${SEEN_VERSIONS[$version_id]:-}" ]]; then
+    return 0
+  fi
+  SEEN_VERSIONS[$version_id]=1
+
   local version_json
   version_json="$(curl -fsSL --retry 3 --retry-all-errors "https://api.modrinth.com/v2/version/$version_id")"
+  version_number="$(jq -r '.version_number' <<<"$version_json")"
+  echo "Resolving $slug @ ${wanted_version:-latest} -> $version_number"
 
   local primary filename
   primary="$(jq -r '[.files[] | select(.primary == true)][0].url // .files[0].url // empty' <<<"$version_json")"
   filename="$(jq -r '[.files[] | select(.primary == true)][0].filename // .files[0].filename // empty' <<<"$version_json")"
-
   [[ -n "$primary" && -n "$filename" ]] || {
-    echo "::error::No downloadable file for $slug @ $wanted_version"
+    echo "::error::No downloadable file for $slug @ $version_number"
     return 1
   }
 
@@ -71,7 +102,6 @@ resolve_mod() {
   while IFS=$'\t' read -r dep_project dep_version dep_type; do
     [[ -z "$dep_project" || "$dep_type" != "required" ]] && continue
     [[ -z "$dep_version" || "$dep_version" == "null" ]] && continue
-
     local dep_slug dep_ver
     dep_slug="$(curl -fsSL --retry 3 --retry-all-errors "https://api.modrinth.com/v2/project/$dep_project" | jq -r '.slug')"
     dep_ver="$(curl -fsSL --retry 3 --retry-all-errors "https://api.modrinth.com/v2/version/$dep_version" | jq -r '.version_number')"
@@ -80,11 +110,9 @@ resolve_mod() {
 }
 
 while IFS='|' read -r slug version; do
-  if [[ -z "$slug" ]]; then
-    continue
-  fi
+  [[ -z "$slug" ]] && continue
   case "$slug" in
-    \#*) continue ;;
+    #*) continue ;;
   esac
   resolve_mod "$slug" "$version"
 done < modpack/mods.txt
@@ -98,7 +126,9 @@ test "$count" -gt 0
 cat > build/client/README.txt <<EOF
 Minecraft 1.21.1 Fabric $LOADER_VERSION
 Generated automatically by GitHub Actions.
-The requested mod versions are pinned to the versions recorded from the server.
+Mod versions are resolved through the Modrinth API.
+Pinned versions use exact matches when available, otherwise compatible release metadata.
+Required dependencies use their exact Modrinth version IDs.
 Voice Chat is intentionally excluded.
 EOF
 
