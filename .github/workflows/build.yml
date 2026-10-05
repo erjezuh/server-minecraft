@@ -6,9 +6,6 @@ on:
       - main
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -87,7 +84,7 @@ jobs:
             echo "  -> $filename"
             curl -fL --retry 3 "$primary" -o "build/client/mods/$filename"
 
-            while IFS=$'	' read -r dep_project dep_version dep_type; do
+            while IFS="$(printf '\\t')" read -r dep_project dep_version dep_type; do
               [[ -z "$dep_project" || "$dep_type" != "required" ]] && continue
               if [[ -n "$dep_version" && "$dep_version" != "null" ]]; then
                 local dep_slug
