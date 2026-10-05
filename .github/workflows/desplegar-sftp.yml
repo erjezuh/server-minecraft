@@ -72,15 +72,33 @@ jobs:
           echo "Prepared deployment payload:"
           find deploy -type f -printf '%P\n' | sort | head -200
 
-      - name: Upload server files via SFTP
-        uses: wearesection/sftp-action@1.0.4
-        with:
-          host: ${{ secrets.SFTP_HOST }}
-          port: ${{ secrets.SFTP_PORT }}
-          username: ${{ secrets.SFTP_USER }}
-          password: ${{ secrets.SFTP_PASSWORD }}
-          localPath: deploy
-          remotePath: ${{ secrets.SFTP_REMOTE_PATH }}
+      - name: Install OpenSSH password helper
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq sshpass
+          sshpass -V
+
+      - name: Upload server files via OpenSSH SFTP
+        env:
+          SSHPASS: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_REMOTE_PATH: ${{ secrets.SFTP_REMOTE_PATH }}
+        run: |
+          set -euo pipefail
+
+          cd deploy
+
+          # Use the native OpenSSH SFTP client instead of the third-party action.
+          # This avoids the action's SSH-agent initialization failure.
+          sshpass -e sftp             -o StrictHostKeyChecking=no             -o UserKnownHostsFile=/dev/null             -o PreferredAuthentications=password             -o PubkeyAuthentication=no             -P "$SFTP_PORT"             "$SFTP_USER@$SFTP_HOST" <<EOF
+          cd "$SFTP_REMOTE_PATH"
+          put -r *
+          EOF
+
+          echo "SFTP upload completed successfully."
 
       - name: Deployment summary
         run: |
