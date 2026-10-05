@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       build_run_id:
-        description: "GitHub Actions run ID containing the approved modpack-1.0.0 artifact"
+        description: "GitHub Actions run ID containing the minecraft-server artifact"
         required: true
         type: string
       confirm:
@@ -85,8 +85,11 @@ jobs:
           set -euo pipefail
           rm -rf deploy
           mkdir -p deploy
-          unzip -q artifact/build/servidor.zip -d deploy
+          unzip -q artifact/servidor.zip -d deploy
           test -n "$(find deploy -type f -print -quit)"
+          test -s deploy/fabric-server-launch.jar
+          test -s deploy/server.jar
+          test -d deploy/mods
 
       - name: Install OpenSSH password helper
         run: |
