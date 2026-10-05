@@ -1,0 +1,219 @@
+name: Publish client ZIP
+
+on:
+  workflow_run:
+    workflows: ["Build Minecraft Server"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: "GitHub Actions run ID containing the minecraft-client-1.21.1-fabric artifact"
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: publish-client
+  cancel-in-progress: false
+
+env:
+  MC_VERSION: "1.21.1"
+  LOADER: "fabric"
+  CLIENT_ARTIFACT: "minecraft-client-1.21.1-fabric"
+  CLIENT_ZIP_NAME: "minecraft-client-1.21.1-fabric.zip"
+
+jobs:
+  publish:
+    if: >-
+      ${{ (github.event_name == 'workflow_run'
+            && github.event.workflow_run.conclusion == 'success'
+            && github.event.workflow_run.event == 'push'
+            && github.event.workflow_run.head_branch == 'main')
+          || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Select triggering build run
+        id: build
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
+          WORKFLOW_RUN_NAME: ${{ github.event.workflow_run.name }}
+          WORKFLOW_RUN_EVENT: ${{ github.event.workflow_run.event }}
+          WORKFLOW_RUN_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          DISPATCH_RUN_ID: ${{ inputs.build_run_id }}
+          FALLBACK_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "workflow_run" ]; then
+            run_id="$WORKFLOW_RUN_ID"
+            target_sha="$WORKFLOW_RUN_HEAD_SHA"
+            echo "Triggered by workflow_run: $WORKFLOW_RUN_NAME ($WORKFLOW_RUN_EVENT)"
+          else
+            run_id="$DISPATCH_RUN_ID"
+            target_sha="$FALLBACK_SHA"
+            echo "Triggered by workflow_dispatch for build run $run_id"
+          fi
+
+          if ! printf '%s' "$run_id" | grep -Eq '^[0-9]+$'; then
+            echo "::error::Build run ID is not numeric: '$run_id'"
+            exit 1
+          fi
+
+          short_sha="${target_sha:0:7}"
+          if [ -z "$short_sha" ]; then
+            echo "::error::Could not determine the commit SHA for the release target."
+            exit 1
+          fi
+
+          {
+            echo "run_id=$run_id"
+            echo "target_sha=$target_sha"
+            echo "short_sha=$short_sha"
+            echo "tag=client-v${MC_VERSION}-${LOADER}-${short_sha}"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Source build run: $run_id"
+          echo "Release target:   $target_sha"
+
+      - name: Download client ZIP artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.CLIENT_ARTIFACT }}
+          path: artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ steps.build.outputs.run_id }}
+
+      - name: Validate downloaded client ZIP
+        id: zip
+        run: |
+          set -euo pipefail
+
+          zip_path="artifact/$CLIENT_ZIP_NAME"
+          test -s "$zip_path" || {
+            echo "::error::Client artifact '$CLIENT_ARTIFACT' did not contain $CLIENT_ZIP_NAME"
+            exit 1
+          }
+
+          unzip -tq "$zip_path"
+
+          mod_count="$(unzip -Z1 "$zip_path" | grep -Ec '^mods/.*\.jar$' || true)"
+          if [ "$mod_count" -eq 0 ]; then
+            echo "::error::The client ZIP contains no mods/*.jar entries."
+            exit 1
+          fi
+
+          zip_sha256="$(sha256sum "$zip_path" | awk '{print $1}')"
+          zip_bytes="$(stat -c %s "$zip_path")"
+          zip_human="$(du -h "$zip_path" | cut -f1 | tr -d '[:space:]')"
+
+          {
+            echo "path=$zip_path"
+            echo "sha256=$zip_sha256"
+            echo "bytes=$zip_bytes"
+            echo "size=$zip_human"
+            echo "mod_count=$mod_count"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Client ZIP:      $CLIENT_ZIP_NAME ($zip_human, $mod_count mod JARs)"
+          echo "SHA-256:         $zip_sha256"
+          echo "Bytes:           $zip_bytes"
+
+      - name: Write release notes
+        id: notes
+        env:
+          BUILD_RUN_ID: ${{ steps.build.outputs.run_id }}
+          SHORT_SHA: ${{ steps.build.outputs.short_sha }}
+          TARGET_SHA: ${{ steps.build.outputs.target_sha }}
+          ZIP_SHA256: ${{ steps.zip.outputs.sha256 }}
+          ZIP_BYTES: ${{ steps.zip.outputs.bytes }}
+          ZIP_SIZE: ${{ steps.zip.outputs.size }}
+          MOD_COUNT: ${{ steps.zip.outputs.mod_count }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: |
+          set -euo pipefail
+          notes_file="$RUNNER_TEMP/release-notes.md"
+          cat > "$notes_file" <<EOF
+          Minecraft $MC_VERSION client modpack (Fabric).
+
+          Built automatically by the *Build Minecraft Server* workflow and published by *Publish client ZIP*.
+
+          - Source build run: [$BUILD_RUN_ID]($REPO_URL/actions/runs/$BUILD_RUN_ID)
+          - Source commit: \`$TARGET_SHA\`
+          - Asset: \`$CLIENT_ZIP_NAME\` ($ZIP_SIZE, $MOD_COUNT mod JARs)
+          - SHA-256: \`$ZIP_SHA256\`
+          - Size in bytes: $ZIP_BYTES
+
+          Unzip the archive into your \`.minecraft\` directory (or a dedicated instance) and launch it with Fabric Loader.
+          EOF
+          echo "path=$notes_file" >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ steps.build.outputs.tag }}
+          TARGET_SHA: ${{ steps.build.outputs.target_sha }}
+          SHORT_SHA: ${{ steps.build.outputs.short_sha }}
+          ZIP_PATH: ${{ steps.zip.outputs.path }}
+          NOTES_FILE: ${{ steps.notes.outputs.path }}
+          BUILD_RUN_ID: ${{ steps.build.outputs.run_id }}
+        run: |
+          set -euo pipefail
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; replacing it."
+            gh release delete "$TAG" --yes --cleanup-tag
+          fi
+
+          gh release create "$TAG" "$ZIP_PATH" \
+            --target "$TARGET_SHA" \
+            --title "Minecraft client $MC_VERSION Fabric ($SHORT_SHA)" \
+            --notes-file "$NOTES_FILE" \
+            --latest
+
+          echo "Published release $TAG from build run $BUILD_RUN_ID."
+
+      - name: Verify published release asset
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ steps.build.outputs.tag }}
+          EXPECTED_SHA256: ${{ steps.zip.outputs.sha256 }}
+          EXPECTED_BYTES: ${{ steps.zip.outputs.bytes }}
+        run: |
+          set -euo pipefail
+
+          release_json="$(gh release view "$TAG" --json name,tagName,url,assets,isLatest)"
+          echo "$release_json" | jq .
+
+          asset_name="$(echo "$release_json" | jq -r ".assets[] | select(.name == \"$CLIENT_ZIP_NAME\") | .name")"
+          asset_size="$(echo "$release_json" | jq -r ".assets[] | select(.name == \"$CLIENT_ZIP_NAME\") | .size")"
+          asset_url="$(echo "$release_json" | jq -r ".assets[] | select(.name == \"$CLIENT_ZIP_NAME\") | .url")"
+          release_url="$(echo "$release_json" | jq -r '.url')"
+
+          test "$asset_name" = "$CLIENT_ZIP_NAME"
+          test "$asset_size" = "$EXPECTED_BYTES"
+
+          gh release download "$TAG" --pattern "$CLIENT_ZIP_NAME" --dir verify
+          downloaded_sha256="$(sha256sum "verify/$CLIENT_ZIP_NAME" | awk '{print $1}')"
+          test "$downloaded_sha256" = "$EXPECTED_SHA256"
+
+          {
+            echo "## Client release published"
+            echo ""
+            echo "- Tag: \`$TAG\`"
+            echo "- Release: $release_url"
+            echo "- Asset: \`$CLIENT_ZIP_NAME\` ($asset_size bytes)"
+            echo "- Asset API URL: $asset_url"
+            echo "- SHA-256 verified: \`$downloaded_sha256\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "Release verified: $release_url"
+          echo "Asset verified:   $CLIENT_ZIP_NAME ($asset_size bytes, sha256 $downloaded_sha256)"
