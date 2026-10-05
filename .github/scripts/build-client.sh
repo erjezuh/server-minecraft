@@ -39,7 +39,7 @@ resolve_mod() {
   version_id="$(jq -r --arg v "$wanted_version" '[.[] | select(.version_number == $v)][0].id // empty' <<<"$versions_json")"
 
   if [[ -z "$version_id" ]]; then
-    version_id="$(jq -r --arg v "$wanted_version" '[.[] | select((.version_number | startswith($v + "-")) or (.version_number | endswith("-" + $v)))] | if length == 1 then .[0].id else empty end' <<<"$versions_json")"
+    version_id="$(jq -r --arg v "$wanted_version" '[.[] | select((.version_number | startswith($v + "-")) or (.version_number | startswith($v + "+")) or (.version_number | endswith("-" + $v)) or (.version_number | endswith("+" + $v)))] | if length == 1 then .[0].id else empty end' <<<"$versions_json")"
   fi
 
   if [[ -z "$version_id" ]]; then
