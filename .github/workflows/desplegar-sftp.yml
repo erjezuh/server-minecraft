@@ -1,6 +1,10 @@
 name: Deploy server via SFTP
 
 on:
+  workflow_run:
+    workflows: ["Build Minecraft Server"]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
     inputs:
       build_run_id:
@@ -22,11 +26,27 @@ concurrency:
 
 jobs:
   deploy:
-    if: ${{ inputs.confirm == 'DEPLOY' }}
+    if: >-
+      ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+          || (github.event_name == 'workflow_dispatch' && inputs.confirm == 'DEPLOY') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
     steps:
+      - name: Select build run
+        id: build
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
+          DISPATCH_RUN_ID: ${{ inputs.build_run_id }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "workflow_run" ]; then
+            echo "run_id=$WORKFLOW_RUN_ID" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_id=$DISPATCH_RUN_ID" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Validate required deployment secrets
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
@@ -42,16 +62,15 @@ jobs:
               exit 1
             fi
           done
-          echo "All required SFTP secrets are present."
 
-      - name: Download approved build artifact
+      - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: modpack-1.0.0
           path: artifact
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
-          run-id: ${{ inputs.build_run_id }}
+          run-id: ${{ steps.build.outputs.run_id }}
 
       - name: Validate server package
         run: |
@@ -59,8 +78,7 @@ jobs:
           test -f artifact/build/servidor.zip
           test -s artifact/build/servidor.zip
           unzip -t artifact/build/servidor.zip >/dev/null
-          echo "servidor.zip is present and is a valid ZIP archive."
-          ls -lh artifact/build/servidor.zip
+          echo "servidor.zip is valid."
 
       - name: Extract server package
         run: |
@@ -69,22 +87,17 @@ jobs:
           mkdir -p deploy
           unzip -q artifact/build/servidor.zip -d deploy
           test -n "$(find deploy -type f -print -quit)"
-          echo "Prepared deployment payload:"
-          find deploy -type f -printf '%P\n' | sort | head -200
 
       - name: Install OpenSSH password helper
         run: |
           set -euo pipefail
           sudo apt-get update -qq
           sudo apt-get install -y -qq sshpass
-          sshpass -V
 
-      - name: Remove obsolete Voice Chat mod from deployment payload
+      - name: Remove obsolete Voice Chat mod
         run: |
           set -euo pipefail
           find deploy -type f -iname 'voicechat-*.jar' -print -delete || true
-          echo "Voice Chat jars present in deployment payload after cleanup:"
-          find deploy -type f -iname 'voicechat-*.jar' -print
 
       - name: Upload server files via OpenSSH SFTP
         env:
@@ -95,9 +108,7 @@ jobs:
           SFTP_REMOTE_PATH: ${{ secrets.SFTP_REMOTE_PATH }}
         run: |
           set -euo pipefail
-
           cd deploy
-
           sshpass -e sftp \
             -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \
@@ -109,11 +120,8 @@ jobs:
           rm mods/voicechat-*.jar
           put -r *
           EOF
-
           echo "SFTP upload completed successfully."
 
       - name: Deployment summary
         run: |
-          echo "SFTP upload completed."
-          echo "Remote path: configured through GitHub Secret SFTP_REMOTE_PATH"
-          echo "Voice Chat was removed from the deployment payload and any matching remote mods/voicechat-*.jar was deleted."
+          echo "SFTP upload completed successfully."
