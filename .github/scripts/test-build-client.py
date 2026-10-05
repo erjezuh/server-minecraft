@@ -40,6 +40,7 @@ class FixtureServer(ThreadingHTTPServer):
                 "dependency.jar",
                 "transitive.jar",
                 "voicechat.jar",
+                "macaws.jar",
             )
         }
         self.requests: list[str] = []
@@ -328,7 +329,7 @@ def main() -> None:
                 raise SystemExit("Canonical CDN fallback was not attempted after the file URL failed")
 
             print("Offline Modrinth integration test passed: version matching, compatible fallback,")
-            print("slug alias, transitive required dependencies, file verification, and ZIP creation.")
+            print("slug aliases, transitive required dependencies, file verification, and ZIP creation.")
         finally:
             server.shutdown()
             server.server_close()

@@ -51,6 +51,7 @@ modrinth_slug() {
     betterfortresses) echo "yungs-better-nether-fortresses" ;;
     bettermineshafts) echo "yungs-better-mineshafts" ;;
     betterstrongholds) echo "yungs-better-strongholds" ;;
+    mcw-*) echo "macaws-${1#mcw-}" ;;
     *) echo "$1" ;;
   esac
 }
