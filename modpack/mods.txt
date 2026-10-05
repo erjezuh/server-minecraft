@@ -23,7 +23,7 @@ emotecraft|2.4.12
 fabric-api|0.116.17+1.21.1
 fabric-language-kotlin|1.14.1+kotlin.2.4.20
 fallingtree|1.21.1.11
-farmers-delight-refabricated|1.21.1-3.3.6+refabricated
+farmers-delight-refabricated|1.21.1-3.3.6
 ferrite-core|7.0.3
 forge-config-api-port|21.1.6
 friends-and-foes|4.0.27
